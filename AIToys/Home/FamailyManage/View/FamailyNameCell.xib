@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="cz8-us-x5s" customClass="FamailyNameCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="55"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cz8-us-x5s" id="Dsd-3c-B3m">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="55"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="i9q-XZ-cQj">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="55"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Home Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QWF-cu-9rY">
+                                <rect key="frame" x="15" y="18" width="90" height="19.333333333333329"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="90" id="wMM-bF-i1m"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cell_right_arrow" translatesAutoresizingMaskIntoConstraints="NO" id="dGo-me-akw">
+                                <rect key="frame" x="281" y="15.666666666666664" width="24" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="24" id="9BU-1d-NVU"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="我的家" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="q4u-vN-ncb">
+                                <rect key="frame" x="115" y="18.666666666666668" width="166" height="18.000000000000004"/>
+                                <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="15"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="QWF-cu-9rY" firstAttribute="centerY" secondItem="i9q-XZ-cQj" secondAttribute="centerY" id="0b6-Qm-IIh"/>
+                            <constraint firstItem="QWF-cu-9rY" firstAttribute="leading" secondItem="i9q-XZ-cQj" secondAttribute="leading" constant="15" id="6Ya-Ny-nq5"/>
+                            <constraint firstItem="dGo-me-akw" firstAttribute="leading" secondItem="q4u-vN-ncb" secondAttribute="trailing" id="Ec0-8Q-SUe"/>
+                            <constraint firstItem="dGo-me-akw" firstAttribute="centerY" secondItem="i9q-XZ-cQj" secondAttribute="centerY" id="K18-FN-HUP"/>
+                            <constraint firstItem="q4u-vN-ncb" firstAttribute="leading" secondItem="QWF-cu-9rY" secondAttribute="trailing" constant="10" id="Y0t-iv-4XR"/>
+                            <constraint firstItem="q4u-vN-ncb" firstAttribute="centerY" secondItem="i9q-XZ-cQj" secondAttribute="centerY" id="fA3-bZ-45m"/>
+                            <constraint firstAttribute="trailing" secondItem="dGo-me-akw" secondAttribute="trailing" constant="15" id="fWM-m3-12X"/>
+                            <constraint firstAttribute="height" constant="55" id="y1Q-cs-ChR"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="i9q-XZ-cQj" firstAttribute="leading" secondItem="Dsd-3c-B3m" secondAttribute="leading" id="8g2-b9-hDV"/>
+                    <constraint firstAttribute="trailing" secondItem="i9q-XZ-cQj" secondAttribute="trailing" id="Bxk-Ls-g6I"/>
+                    <constraint firstAttribute="bottom" secondItem="i9q-XZ-cQj" secondAttribute="bottom" id="U8G-p8-TJI"/>
+                    <constraint firstItem="i9q-XZ-cQj" firstAttribute="top" secondItem="Dsd-3c-B3m" secondAttribute="top" id="qcd-Fw-AT8"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="Pr5-DE-bcl"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="nameLabel" destination="q4u-vN-ncb" id="FdR-cQ-ROO"/>
+                <outlet property="rightImg" destination="dGo-me-akw" id="SI1-9f-hCx"/>
+                <outlet property="rightImgW" destination="9BU-1d-NVU" id="dJk-mU-cL9"/>
+                <outlet property="titleLabel" destination="QWF-cu-9rY" id="v3C-Sj-Fif"/>
+            </connections>
+            <point key="canvasLocation" x="129.7709923664122" y="-11.619718309859156"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="cell_right_arrow" width="24" height="24"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

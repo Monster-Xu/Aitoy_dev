@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="KGk-i7-Jjw" customClass="GuideOpenAppPermmitCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="151"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="151"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JUZ-51-qje">
+                        <rect key="frame" x="20" y="0.0" width="280" height="0.66666666666666663"/>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.10000000000000001" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="0.5" id="G5V-3V-GL1"/>
+                        </constraints>
+                    </view>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="允许本应用的“蓝牙”权限" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4HE-Sq-nxr">
+                        <rect key="frame" x="20" y="43.666666666666671" width="96" height="33.666666666666671"/>
+                        <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="14"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="guide_bluetooth_01" translatesAutoresizingMaskIntoConstraints="NO" id="puw-Qn-knM">
+                        <rect key="frame" x="128" y="20.666666666666664" width="176" height="110.33333333333334"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="176" id="28o-Zl-F3l"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6g8-gp-8EF">
+                        <rect key="frame" x="20" y="87.333333333333329" width="56" height="29"/>
+                        <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="14"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" title="去设置 &gt;">
+                            <color key="titleColor" red="0.098039215686274508" green="0.53725490196078429" blue="0.98039215686274506" alpha="1" colorSpace="calibratedRGB"/>
+                        </state>
+                        <connections>
+                            <action selector="settingBtnClick:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="cTg-sG-tBk"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="puw-Qn-knM" secondAttribute="bottom" constant="20" id="3Ej-Hb-UsG"/>
+                    <constraint firstItem="6g8-gp-8EF" firstAttribute="leading" secondItem="4HE-Sq-nxr" secondAttribute="leading" id="7gW-yl-4NS"/>
+                    <constraint firstItem="JUZ-51-qje" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="FmZ-pz-QOx"/>
+                    <constraint firstItem="4HE-Sq-nxr" firstAttribute="top" secondItem="JUZ-51-qje" secondAttribute="bottom" constant="43" id="Gtr-5D-ddm"/>
+                    <constraint firstAttribute="trailing" secondItem="JUZ-51-qje" secondAttribute="trailing" constant="20" id="HKM-Kp-lff"/>
+                    <constraint firstItem="6g8-gp-8EF" firstAttribute="top" secondItem="4HE-Sq-nxr" secondAttribute="bottom" constant="10" id="Hwl-DY-2wQ"/>
+                    <constraint firstAttribute="trailing" secondItem="puw-Qn-knM" secondAttribute="trailing" constant="16" id="TBd-Gp-qOK"/>
+                    <constraint firstItem="puw-Qn-knM" firstAttribute="leading" secondItem="4HE-Sq-nxr" secondAttribute="trailing" constant="12" id="a00-NF-PA4"/>
+                    <constraint firstItem="puw-Qn-knM" firstAttribute="top" secondItem="JUZ-51-qje" secondAttribute="bottom" constant="20" id="fSu-Qd-qrL"/>
+                    <constraint firstItem="4HE-Sq-nxr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="iSi-mV-kSo"/>
+                    <constraint firstItem="JUZ-51-qje" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="tlP-P4-YhR"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
+            <connections>
+                <outlet property="imgView" destination="puw-Qn-knM" id="9xi-gX-OQf"/>
+                <outlet property="nameLabel" destination="4HE-Sq-nxr" id="cLr-px-UMc"/>
+                <outlet property="settingBtn" destination="6g8-gp-8EF" id="IdD-A1-q8l"/>
+            </connections>
+            <point key="canvasLocation" x="-27.480916030534349" y="-12.323943661971832"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="guide_bluetooth_01" width="176" height="110"/>
+    </resources>
+</document>

@@ -1,0 +1,12 @@
+/* 
+  InfoPlist.strings
+  AIToys
+
+  Created by 乔不赖 on 2025/6/17.
+  
+*/
+CFBundleDisplayName = "Talenpal";
+NSBluetoothAlwaysUsageDescription = "Enable Bluetooth to search devices";
+NSLocationWhenInUseUsageDescription = "Location permissions will be used for smart device automation, discovery of nearby devices, Wi-Fi lists, and more. Please grant the permission to the app.";
+NSLocationAlwaysUsageDescription = "Location permissions will be used for smart device automation, discovery of nearby devices, Wi-Fi lists, and more. Please grant the permission to the app.";
+NSCameraUsageDescription = "Allow the use of cameras to scan device QR codes";

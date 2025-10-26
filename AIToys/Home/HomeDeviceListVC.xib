@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="HomeDeviceListVC">
+            <connections>
+                <outlet property="btnView" destination="Exh-L8-Dsw" id="RzU-LO-Ble"/>
+                <outlet property="collectionView" destination="kCA-l8-FJc" id="OBh-W5-EbU"/>
+                <outlet property="colletionBottomH" destination="5u1-Os-5tU" id="fTH-oS-PBU"/>
+                <outlet property="deleteBtn" destination="F2j-Ov-XCp" id="lqA-Su-jVS"/>
+                <outlet property="makeTopBtn" destination="zbm-JT-JiD" id="hrZ-Np-2o3"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="kCA-l8-FJc">
+                    <rect key="frame" x="0.0" y="118" width="393" height="666"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Ots-nJ-dBU">
+                        <size key="itemSize" width="128" height="128"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="Fmb-2Z-jhY"/>
+                        <outlet property="delegate" destination="-1" id="7RE-3w-0li"/>
+                    </connections>
+                </collectionView>
+                <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Exh-L8-Dsw">
+                    <rect key="frame" x="0.0" y="716" width="393" height="68"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="F2j-Ov-XCp">
+                            <rect key="frame" x="15" y="16" width="175.66666666666666" height="36"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="36" id="Vej-OO-R9I"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="删除设备">
+                                <color key="titleColor" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="18"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                    <real key="value" value="1"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                    <color key="value" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="deleteDeviceBtnClick:" destination="-1" eventType="touchUpInside" id="cVz-bW-mtb"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zbm-JT-JiD">
+                            <rect key="frame" x="202.66666666666663" y="16" width="175.33333333333337" height="36"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="36" id="iRU-J0-p0T"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                            <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                            <state key="normal" title="置顶">
+                                <color key="titleColor" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </state>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="18"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                    <real key="value" value="1"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                    <color key="value" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="setDeviceTop:" destination="-1" eventType="touchUpInside" id="FS0-St-pDK"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="zbm-JT-JiD" firstAttribute="leading" secondItem="F2j-Ov-XCp" secondAttribute="trailing" constant="12" id="0Cr-rk-Nrs"/>
+                        <constraint firstAttribute="trailing" secondItem="zbm-JT-JiD" secondAttribute="trailing" constant="15" id="1Aj-lC-Xnr"/>
+                        <constraint firstAttribute="bottom" secondItem="F2j-Ov-XCp" secondAttribute="bottom" constant="16" id="2yL-JZ-gxY"/>
+                        <constraint firstItem="F2j-Ov-XCp" firstAttribute="top" secondItem="Exh-L8-Dsw" secondAttribute="top" constant="16" id="Kzk-ZW-k3H"/>
+                        <constraint firstItem="F2j-Ov-XCp" firstAttribute="leading" secondItem="Exh-L8-Dsw" secondAttribute="leading" constant="15" id="dVA-yk-Rb1"/>
+                        <constraint firstItem="zbm-JT-JiD" firstAttribute="width" secondItem="F2j-Ov-XCp" secondAttribute="width" id="fQi-c6-Vug"/>
+                        <constraint firstItem="zbm-JT-JiD" firstAttribute="centerY" secondItem="F2j-Ov-XCp" secondAttribute="centerY" id="r4d-YY-YcT"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="kCA-l8-FJc" secondAttribute="bottom" id="5u1-Os-5tU"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="kCA-l8-FJc" secondAttribute="trailing" id="Id6-ev-Of6"/>
+                <constraint firstItem="kCA-l8-FJc" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="Mu2-iV-07Q"/>
+                <constraint firstItem="Exh-L8-Dsw" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="fKm-bK-hj9"/>
+                <constraint firstItem="Exh-L8-Dsw" firstAttribute="trailing" secondItem="Q5M-cg-NOt" secondAttribute="trailing" id="hog-49-DjI"/>
+                <constraint firstItem="Exh-L8-Dsw" firstAttribute="bottom" secondItem="Q5M-cg-NOt" secondAttribute="bottom" id="rJv-QP-7YK"/>
+                <constraint firstItem="kCA-l8-FJc" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="xRS-5k-rlx"/>
+            </constraints>
+            <point key="canvasLocation" x="130.53435114503816" y="-11.267605633802818"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" rowHeight="235" id="KGk-i7-Jjw" customClass="UserPermmitCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="235"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="235"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0QE-1l-vfI">
+                        <rect key="frame" x="15" y="15" width="290" height="205"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="choose_normal" highlightedImage="choose_sel" translatesAutoresizingMaskIntoConstraints="NO" id="YWY-ai-Jjw">
+                                <rect key="frame" x="15" y="92.666666666666671" width="20" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="20" id="8uN-Ey-Yvc"/>
+                                    <constraint firstAttribute="height" constant="20" id="HEc-h8-egz"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Service Maintenance &amp; lmprovement Activity" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FLe-5L-EnP">
+                                <rect key="frame" x="50" y="15" width="225" height="34"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="34" id="mAD-gc-vP4"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="SFRounded-Medium" family="SF Pro Rounded" pointSize="14"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iOr-eE-72i">
+                                <rect key="frame" x="50" y="59" width="225" height="131"/>
+                                <string key="text">Allow us to collect data related to product usage.Basic functionality will still be available if permissions are disabled, but the experience
+optimization policy based on data preferences willbe ineffective.</string>
+                                <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="12"/>
+                                <color key="textColor" white="0.0" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="iOr-eE-72i" secondAttribute="bottom" constant="15" id="5WC-ZP-YyG"/>
+                            <constraint firstItem="iOr-eE-72i" firstAttribute="trailing" secondItem="FLe-5L-EnP" secondAttribute="trailing" id="C9V-y1-2Ok"/>
+                            <constraint firstItem="FLe-5L-EnP" firstAttribute="leading" secondItem="YWY-ai-Jjw" secondAttribute="trailing" constant="15" id="GNV-3r-I5I"/>
+                            <constraint firstAttribute="trailing" secondItem="FLe-5L-EnP" secondAttribute="trailing" constant="15" id="NVp-kd-6n6"/>
+                            <constraint firstItem="FLe-5L-EnP" firstAttribute="top" secondItem="0QE-1l-vfI" secondAttribute="top" constant="15" id="Wh3-6f-Qt9"/>
+                            <constraint firstItem="iOr-eE-72i" firstAttribute="top" secondItem="FLe-5L-EnP" secondAttribute="bottom" constant="10" id="Zpw-Tl-W2v"/>
+                            <constraint firstItem="iOr-eE-72i" firstAttribute="leading" secondItem="FLe-5L-EnP" secondAttribute="leading" id="Zvp-2P-xxP"/>
+                            <constraint firstItem="YWY-ai-Jjw" firstAttribute="leading" secondItem="0QE-1l-vfI" secondAttribute="leading" constant="15" id="lOF-IM-CPB"/>
+                            <constraint firstItem="YWY-ai-Jjw" firstAttribute="centerY" secondItem="0QE-1l-vfI" secondAttribute="centerY" id="pV4-M2-VKw"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="12"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="0QE-1l-vfI" secondAttribute="bottom" constant="15" id="7Ca-mU-qiI"/>
+                    <constraint firstAttribute="trailing" secondItem="0QE-1l-vfI" secondAttribute="trailing" constant="15" id="Aok-PB-Dhp"/>
+                    <constraint firstItem="0QE-1l-vfI" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="sax-gV-9vF"/>
+                    <constraint firstItem="0QE-1l-vfI" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="15" id="zIX-io-in0"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="selImgView" destination="YWY-ai-Jjw" id="Q99-54-4O8"/>
+                <outlet property="subTitleLab" destination="iOr-eE-72i" id="jpA-Hk-7LX"/>
+                <outlet property="titleLabel" destination="FLe-5L-EnP" id="KtM-dw-1Yj"/>
+            </connections>
+            <point key="canvasLocation" x="129.7709923664122" y="55.985915492957751"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="choose_normal" width="24" height="24"/>
+        <image name="choose_sel" width="24" height="24"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

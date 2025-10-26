@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ChangeEmailViewController">
+            <connections>
+                <outlet property="alertLabel" destination="yvY-B2-mYM" id="DNK-PB-gkg"/>
+                <outlet property="pwdTextField" destination="HRB-7z-0uc" id="EWt-eU-6T6"/>
+                <outlet property="pwdTitleH" destination="Dwa-kU-qbL" id="Idr-bF-ZdJ"/>
+                <outlet property="pwdTitleLabel" destination="FSB-sm-OAv" id="xe2-JD-a52"/>
+                <outlet property="surBtn" destination="Fbl-rj-K0h" id="Bqw-aO-3G2"/>
+                <outlet property="titleLabel" destination="MNW-uF-raO" id="eVb-Ks-BGe"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+                <outlet property="viewBtn" destination="Je2-CP-dOX" id="xey-3Q-wCE"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="密码设置" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MNW-uF-raO">
+                    <rect key="frame" x="30" y="138" width="333" height="48"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="48" id="e1b-wx-9kZ"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="SFRounded-Bold" family="SF Pro Rounded" pointSize="28"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="The current Email  is：2332323@qq.com,please enter your password to continue" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yvY-B2-mYM">
+                    <rect key="frame" x="30" y="191" width="333" height="31.333333333333343"/>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="13"/>
+                    <color key="textColor" red="0.80000000000000004" green="0.80000000000000004" blue="0.80000000000000004" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hFi-iy-QJ2">
+                    <rect key="frame" x="30" y="237.33333333333337" width="333" height="64"/>
+                    <subviews>
+                        <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="密码" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FSB-sm-OAv">
+                            <rect key="frame" x="8" y="8" width="22" height="0.0"/>
+                            <constraints>
+                                <constraint firstAttribute="height" id="Dwa-kU-qbL"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="11"/>
+                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="密码" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="HRB-7z-0uc">
+                            <rect key="frame" x="8" y="8" width="300" height="48"/>
+                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                            <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                            <connections>
+                                <action selector="textFieldEditChanged:" destination="-1" eventType="editingChanged" id="RhH-aQ-pEb"/>
+                            </connections>
+                        </textField>
+                        <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Je2-CP-dOX">
+                            <rect key="frame" x="308" y="20.999999999999972" width="25" height="22"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="25" id="XE2-xB-1IH"/>
+                            </constraints>
+                            <state key="normal" title="Button" image="login_eye"/>
+                            <state key="selected" image="login_closeEye"/>
+                            <connections>
+                                <action selector="viewPwd:" destination="-1" eventType="touchUpInside" id="pdp-4P-oAw"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" red="0.96470588239999999" green="0.96862745100000003" blue="0.98431372549999996" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="Je2-CP-dOX" secondAttribute="trailing" id="0g5-wL-KCT"/>
+                        <constraint firstItem="HRB-7z-0uc" firstAttribute="top" secondItem="FSB-sm-OAv" secondAttribute="bottom" id="F6z-2N-TmC"/>
+                        <constraint firstAttribute="bottom" secondItem="HRB-7z-0uc" secondAttribute="bottom" constant="8" id="GJN-kG-A0m"/>
+                        <constraint firstItem="Je2-CP-dOX" firstAttribute="leading" secondItem="HRB-7z-0uc" secondAttribute="trailing" id="L7Z-Ia-614"/>
+                        <constraint firstItem="Je2-CP-dOX" firstAttribute="centerY" secondItem="HRB-7z-0uc" secondAttribute="centerY" id="Rmd-0I-GxQ"/>
+                        <constraint firstItem="FSB-sm-OAv" firstAttribute="leading" secondItem="hFi-iy-QJ2" secondAttribute="leading" constant="8" id="aZA-a8-0Dw"/>
+                        <constraint firstAttribute="height" constant="64" id="f1t-pP-bHh"/>
+                        <constraint firstItem="FSB-sm-OAv" firstAttribute="top" secondItem="hFi-iy-QJ2" secondAttribute="top" constant="8" id="vDx-9r-5bX"/>
+                        <constraint firstItem="HRB-7z-0uc" firstAttribute="leading" secondItem="FSB-sm-OAv" secondAttribute="leading" id="xcc-GK-PdV"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="12"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fbl-rj-K0h">
+                    <rect key="frame" x="30" y="349.33333333333331" width="333" height="48"/>
+                    <color key="backgroundColor" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="48" id="kNX-uC-qne"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="下一步"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="24"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="sureBtnClick:" destination="-1" eventType="touchUpInside" id="v0R-oy-ejf"/>
+                    </connections>
+                </button>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="hFi-iy-QJ2" firstAttribute="top" secondItem="yvY-B2-mYM" secondAttribute="bottom" constant="15" id="4u1-nU-LpH"/>
+                <constraint firstItem="Fbl-rj-K0h" firstAttribute="trailing" secondItem="MNW-uF-raO" secondAttribute="trailing" id="Gwg-jf-0zq"/>
+                <constraint firstItem="MNW-uF-raO" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="30" id="REZ-do-Q8C"/>
+                <constraint firstItem="yvY-B2-mYM" firstAttribute="leading" secondItem="hFi-iy-QJ2" secondAttribute="leading" id="Rtv-h8-bKh"/>
+                <constraint firstItem="yvY-B2-mYM" firstAttribute="trailing" secondItem="MNW-uF-raO" secondAttribute="trailing" id="ULk-eN-UMA"/>
+                <constraint firstItem="MNW-uF-raO" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" constant="20" id="XKI-12-M7b"/>
+                <constraint firstItem="yvY-B2-mYM" firstAttribute="top" secondItem="MNW-uF-raO" secondAttribute="bottom" constant="5" id="c5e-33-w7o"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="MNW-uF-raO" secondAttribute="trailing" constant="30" id="c7H-uY-A6Z"/>
+                <constraint firstItem="Fbl-rj-K0h" firstAttribute="leading" secondItem="MNW-uF-raO" secondAttribute="leading" id="cKi-TL-Q6x"/>
+                <constraint firstItem="hFi-iy-QJ2" firstAttribute="trailing" secondItem="MNW-uF-raO" secondAttribute="trailing" id="ktz-6d-Zwt"/>
+                <constraint firstItem="hFi-iy-QJ2" firstAttribute="leading" secondItem="MNW-uF-raO" secondAttribute="leading" id="umz-aW-PRr"/>
+                <constraint firstItem="Fbl-rj-K0h" firstAttribute="top" secondItem="hFi-iy-QJ2" secondAttribute="bottom" constant="48" id="wbc-R4-U3m"/>
+            </constraints>
+            <point key="canvasLocation" x="22.137404580152669" y="-11.267605633802818"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="login_closeEye" width="20" height="20"/>
+        <image name="login_eye" width="18" height="18"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

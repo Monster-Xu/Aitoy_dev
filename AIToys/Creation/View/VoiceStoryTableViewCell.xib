@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="134" id="KGk-i7-Jjw" customClass="VoiceStoryTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="134"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="393" height="134"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="默认头像" translatesAutoresizingMaskIntoConstraints="NO" id="okD-5a-5XC">
+                        <rect key="frame" x="12" y="12" width="64" height="62"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="64" id="3tY-0F-Fht"/>
+                            <constraint firstAttribute="height" constant="62" id="PGu-GL-ufu"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Story nameStory name Storytory name Story..." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V2a-WI-bHM">
+                        <rect key="frame" x="80" y="11.999999999999996" width="224" height="40.666666666666657"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qdo-AY-Pk9">
+                        <rect key="frame" x="357" y="31" width="24" height="24"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="24" id="tRp-Z6-fWt"/>
+                            <constraint firstAttribute="width" constant="24" id="uBl-wH-Rhu"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" image="create_play"/>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Voice - Dad" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nFZ-T5-v0Z">
+                        <rect key="frame" x="79" y="56.666666666666657" width="89.333333333333314" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pQR-tY-tWV">
+                        <rect key="frame" x="321" y="31" width="24" height="24"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="24" id="4Gp-p0-ESh"/>
+                            <constraint firstAttribute="height" constant="24" id="jhx-aJ-wXx"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" image="create_edit"/>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="pQR-tY-tWV" firstAttribute="centerY" secondItem="okD-5a-5XC" secondAttribute="centerY" id="29d-6r-QPT"/>
+                    <constraint firstItem="nFZ-T5-v0Z" firstAttribute="top" secondItem="V2a-WI-bHM" secondAttribute="bottom" constant="4" id="7Nj-FS-1pr"/>
+                    <constraint firstItem="V2a-WI-bHM" firstAttribute="leading" secondItem="okD-5a-5XC" secondAttribute="trailing" constant="4" id="Cg0-LT-4ld"/>
+                    <constraint firstItem="qdo-AY-Pk9" firstAttribute="centerY" secondItem="okD-5a-5XC" secondAttribute="centerY" id="Ebk-rh-DPx"/>
+                    <constraint firstItem="V2a-WI-bHM" firstAttribute="top" secondItem="okD-5a-5XC" secondAttribute="top" id="Fqg-4a-UBd"/>
+                    <constraint firstItem="okD-5a-5XC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="12" id="L2W-xz-Dxv"/>
+                    <constraint firstItem="nFZ-T5-v0Z" firstAttribute="leading" secondItem="okD-5a-5XC" secondAttribute="trailing" constant="3" id="NpE-wh-2pC"/>
+                    <constraint firstAttribute="trailing" secondItem="qdo-AY-Pk9" secondAttribute="trailing" constant="12" id="VWu-bc-oEv"/>
+                    <constraint firstItem="okD-5a-5XC" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="12" id="WkZ-HB-G4C"/>
+                    <constraint firstItem="pQR-tY-tWV" firstAttribute="leading" secondItem="V2a-WI-bHM" secondAttribute="trailing" constant="17" id="taZ-aW-Asa"/>
+                    <constraint firstItem="qdo-AY-Pk9" firstAttribute="leading" secondItem="pQR-tY-tWV" secondAttribute="trailing" constant="12" id="x6c-ft-Ipc"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
+            <point key="canvasLocation" x="194.6564885496183" y="185.21126760563382"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="create_edit" width="24" height="24"/>
+        <image name="create_play" width="24" height="24"/>
+        <image name="默认头像" width="25" height="25"/>
+    </resources>
+</document>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="SFProRoundedRegular.otf">
+            <string>SFProRounded-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="3sf-JJ-4wa" customClass="DeviceHavenFindItem">
+            <rect key="frame" x="0.0" y="0.0" width="421" height="350"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="421" height="350"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="故事机" translatesAutoresizingMaskIntoConstraints="NO" id="7Gb-Ox-g1z">
+                        <rect key="frame" x="140.66666666666666" y="45" width="139.99999999999997" height="140"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="140" id="0ej-Ot-aBK"/>
+                            <constraint firstAttribute="width" constant="140" id="3VH-cC-0IS"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Talenpal Player" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VAn-cJ-Mkb">
+                        <rect key="frame" x="0.0" y="249" width="421" height="13"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="13" id="2rf-q7-1BX"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="11"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="屏幕数字" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iaf-A3-zwF">
+                        <rect key="frame" x="182.66666666666666" y="222" width="56" height="17"/>
+                        <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="14"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.45000000000000001" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3QK-Vs-qOp">
+                        <rect key="frame" x="130.66666666666666" y="282" width="159.99999999999997" height="36"/>
+                        <color key="backgroundColor" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="36" id="AN8-fB-R0f"/>
+                            <constraint firstAttribute="width" constant="160" id="LBM-TG-xUp"/>
+                        </constraints>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <state key="normal" title="Button"/>
+                        <buttonConfiguration key="configuration" style="plain" title="添加此设备"/>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="18"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <action selector="addDeviceBtnClick:" destination="3sf-JJ-4wa" eventType="touchUpInside" id="Upl-a2-roF"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+            <viewLayoutGuide key="safeArea" id="QTS-iG-dMe"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="VAn-cJ-Mkb" secondAttribute="trailing" id="0iN-DR-9SU"/>
+                <constraint firstItem="7Gb-Ox-g1z" firstAttribute="top" secondItem="3sf-JJ-4wa" secondAttribute="top" constant="45" id="6vN-ER-qoi"/>
+                <constraint firstAttribute="bottom" secondItem="3QK-Vs-qOp" secondAttribute="bottom" constant="32" id="EmF-qt-XKl"/>
+                <constraint firstItem="Iaf-A3-zwF" firstAttribute="top" secondItem="7Gb-Ox-g1z" secondAttribute="bottom" constant="37" id="IHR-pu-cZR"/>
+                <constraint firstItem="3QK-Vs-qOp" firstAttribute="centerX" secondItem="3sf-JJ-4wa" secondAttribute="centerX" id="Jgx-97-cDt"/>
+                <constraint firstItem="7Gb-Ox-g1z" firstAttribute="centerX" secondItem="QTS-iG-dMe" secondAttribute="centerX" id="KCs-uR-h32"/>
+                <constraint firstItem="VAn-cJ-Mkb" firstAttribute="centerX" secondItem="3sf-JJ-4wa" secondAttribute="centerX" id="WN7-2N-05R"/>
+                <constraint firstItem="Iaf-A3-zwF" firstAttribute="centerX" secondItem="3sf-JJ-4wa" secondAttribute="centerX" id="ZNo-M4-2gX"/>
+                <constraint firstItem="VAn-cJ-Mkb" firstAttribute="leading" secondItem="3sf-JJ-4wa" secondAttribute="leading" id="i2a-Z7-5dR"/>
+                <constraint firstItem="VAn-cJ-Mkb" firstAttribute="top" secondItem="Iaf-A3-zwF" secondAttribute="bottom" constant="10" id="kzB-5S-hev"/>
+            </constraints>
+            <size key="customSize" width="421" height="412"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                    <color key="value" red="0.0" green="0.0" blue="0.0" alpha="0.45000000000000001" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                </userDefinedRuntimeAttribute>
+                <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                    <real key="value" value="1"/>
+                </userDefinedRuntimeAttribute>
+                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                    <real key="value" value="24"/>
+                </userDefinedRuntimeAttribute>
+            </userDefinedRuntimeAttributes>
+            <connections>
+                <outlet property="imgView" destination="7Gb-Ox-g1z" id="dGm-9F-kJS"/>
+                <outlet property="nameLabel" destination="VAn-cJ-Mkb" id="EMp-X8-bh5"/>
+            </connections>
+            <point key="canvasLocation" x="74.045801526717554" y="71.83098591549296"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="故事机" width="140" height="140"/>
+    </resources>
+</document>

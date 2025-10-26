@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="SFProRoundedMedium.ttf">
+            <string>SFRounded-Medium</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="79" id="KGk-i7-Jjw" customClass="DeviceHavenFindCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="160"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="160"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="11R-nC-TUF">
+                        <rect key="frame" x="15" y="0.0" width="290" height="160"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="发现设备..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Qe-eg-Zyf">
+                                <rect key="frame" x="15" y="16" width="76.666666666666671" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="vwY-xb-vZ3"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="SFRounded-Medium" family="SF Pro Rounded" pointSize="16"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RDR-Vl-qUn">
+                                <rect key="frame" x="0.0" y="36" width="290" height="124"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="RDR-Vl-qUn" firstAttribute="top" secondItem="2Qe-eg-Zyf" secondAttribute="bottom" id="1we-LU-9cu"/>
+                            <constraint firstItem="2Qe-eg-Zyf" firstAttribute="top" secondItem="11R-nC-TUF" secondAttribute="top" constant="16" id="2q8-Dy-RpR"/>
+                            <constraint firstAttribute="trailing" secondItem="RDR-Vl-qUn" secondAttribute="trailing" id="FEH-9w-1hu"/>
+                            <constraint firstAttribute="bottom" secondItem="RDR-Vl-qUn" secondAttribute="bottom" id="H0E-1z-K4o"/>
+                            <constraint firstItem="2Qe-eg-Zyf" firstAttribute="leading" secondItem="11R-nC-TUF" secondAttribute="leading" constant="15" id="Pcn-SM-rRk"/>
+                            <constraint firstAttribute="height" constant="160" id="duO-ZU-yyE"/>
+                            <constraint firstItem="RDR-Vl-qUn" firstAttribute="leading" secondItem="11R-nC-TUF" secondAttribute="leading" id="nNz-yK-Mdp"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="11R-nC-TUF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="9gi-Yo-9bu"/>
+                    <constraint firstAttribute="bottom" secondItem="11R-nC-TUF" secondAttribute="bottom" id="HZU-vp-tpm"/>
+                    <constraint firstItem="11R-nC-TUF" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="TEv-pW-T2g"/>
+                    <constraint firstAttribute="trailing" secondItem="11R-nC-TUF" secondAttribute="trailing" constant="15" id="YAk-NV-s2G"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
+            <connections>
+                <outlet property="containerView" destination="RDR-Vl-qUn" id="fxp-ME-C8R"/>
+                <outlet property="titleLabel" destination="2Qe-eg-Zyf" id="Drj-gQ-dyB"/>
+            </connections>
+            <point key="canvasLocation" x="0.0" y="-0.70422535211267612"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

@@ -1,0 +1,12 @@
+/* 
+  InfoPlist.strings
+  AIToys
+
+  Created by 乔不赖 on 2025/6/17.
+  
+*/
+CFBundleDisplayName = "Talenpal";
+NSBluetoothAlwaysUsageDescription = "允许使用蓝牙以访问你附近的设备";
+NSLocationWhenInUseUsageDescription = "定位权限将用于智能设备自动化、发现附近设备及 Wi-Fi 列表等功能。请授权 App 使用该权限。";
+NSLocationAlwaysUsageDescription = "定位权限将用于智能设备自动化、发现附近设备及 Wi-Fi 列表等功能。请授权 App 使用该权限。";
+NSCameraUsageDescription = "允许使用相机以扫描设备二维码";

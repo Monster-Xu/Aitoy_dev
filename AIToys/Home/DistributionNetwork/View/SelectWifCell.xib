@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="KGk-i7-Jjw" customClass="SelectWifCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="64"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="64"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eBx-zl-2eY">
+                        <rect key="frame" x="32" y="0.0" width="256" height="64"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tuya-Test 02" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6oh-Ml-qnJ">
+                                <rect key="frame" x="15" y="22.333333333333336" width="94.333333333333329" height="19.333333333333336"/>
+                                <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_search_wifi" translatesAutoresizingMaskIntoConstraints="NO" id="aKq-ta-77m">
+                                <rect key="frame" x="225" y="24" width="16" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="16" id="GUi-40-cW9"/>
+                                    <constraint firstAttribute="width" constant="16" id="deh-Mp-ud5"/>
+                                </constraints>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="wifi_securit" translatesAutoresizingMaskIntoConstraints="NO" id="XYD-cr-ZCL">
+                                <rect key="frame" x="194" y="24" width="16" height="16"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="16" id="3KX-kF-K4a"/>
+                                    <constraint firstAttribute="width" constant="16" id="iN6-5w-JyX"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.050000000000000003" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="64" id="B47-e8-d8L"/>
+                            <constraint firstItem="aKq-ta-77m" firstAttribute="leading" secondItem="XYD-cr-ZCL" secondAttribute="trailing" constant="15" id="D2o-Cd-ihh"/>
+                            <constraint firstItem="aKq-ta-77m" firstAttribute="centerY" secondItem="eBx-zl-2eY" secondAttribute="centerY" id="DDP-T7-z9X"/>
+                            <constraint firstAttribute="trailing" secondItem="aKq-ta-77m" secondAttribute="trailing" constant="15" id="OMa-tj-S6W"/>
+                            <constraint firstItem="6oh-Ml-qnJ" firstAttribute="centerY" secondItem="eBx-zl-2eY" secondAttribute="centerY" id="hdo-lp-gKL"/>
+                            <constraint firstItem="XYD-cr-ZCL" firstAttribute="centerY" secondItem="eBx-zl-2eY" secondAttribute="centerY" id="kQX-mh-VGT"/>
+                            <constraint firstItem="6oh-Ml-qnJ" firstAttribute="leading" secondItem="eBx-zl-2eY" secondAttribute="leading" constant="15" id="xIF-Vc-Rk2"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="eBx-zl-2eY" secondAttribute="trailing" constant="32" id="2Ok-Eq-I5F"/>
+                    <constraint firstAttribute="bottom" secondItem="eBx-zl-2eY" secondAttribute="bottom" id="GFr-8b-FbU"/>
+                    <constraint firstItem="eBx-zl-2eY" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="32" id="cGy-mw-PTl"/>
+                    <constraint firstItem="eBx-zl-2eY" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="q6j-KR-dkt"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="isPwdImgView" destination="XYD-cr-ZCL" id="ghX-eJ-Axh"/>
+                <outlet property="titleLabel" destination="6oh-Ml-qnJ" id="NVz-EU-PE0"/>
+                <outlet property="wifiImgView" destination="aKq-ta-77m" id="W21-LI-68r"/>
+            </connections>
+            <point key="canvasLocation" x="129.7709923664122" y="-11.267605633802818"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="icon_search_wifi" width="16" height="16"/>
+        <image name="wifi_securit" width="16" height="16"/>
+    </resources>
+</document>

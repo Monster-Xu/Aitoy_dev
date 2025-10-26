@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="KGk-i7-Jjw" customClass="DeviceUnfindCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="316"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="316"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nWZ-KW-Fha">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="316"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_notice" translatesAutoresizingMaskIntoConstraints="NO" id="h3F-nD-cVG">
+                                <rect key="frame" x="120" y="40" width="80" height="80"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="80" id="hZX-ey-JFI"/>
+                                    <constraint firstAttribute="width" constant="80" id="ykb-1L-S2c"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No nearby devices has been found" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oxw-Z8-RZB">
+                                <rect key="frame" x="15" y="132" width="290" height="19.333333333333343"/>
+                                <fontDescription key="fontDescription" name="SFRounded-Bold" family="SF Pro Rounded" pointSize="16"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please check the help and confirm that the device is waiting to be connected" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RMJ-Lz-b27">
+                                <rect key="frame" x="15" y="159.33333333333334" width="290" height="33.666666666666657"/>
+                                <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="14"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VYr-WY-Gh5">
+                                <rect key="frame" x="92.666666666666686" y="218" width="135" height="48"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="48" id="aZN-Ez-qXK"/>
+                                    <constraint firstAttribute="width" constant="135" id="eVA-HS-pwF"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="SFRounded-Bold" family="SF Pro Rounded" pointSize="16"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Try Again">
+                                    <color key="titleColor" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="24"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                        <real key="value" value="1"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                        <color key="value" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="tryBtnClick:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Wbs-tx-d0x"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="VYr-WY-Gh5" firstAttribute="centerX" secondItem="nWZ-KW-Fha" secondAttribute="centerX" id="6pW-SE-Hw5"/>
+                            <constraint firstAttribute="bottom" secondItem="VYr-WY-Gh5" secondAttribute="bottom" constant="50" id="7ay-E0-zY8"/>
+                            <constraint firstItem="RMJ-Lz-b27" firstAttribute="leading" secondItem="oxw-Z8-RZB" secondAttribute="leading" id="8Sc-lt-ABQ"/>
+                            <constraint firstItem="oxw-Z8-RZB" firstAttribute="leading" secondItem="nWZ-KW-Fha" secondAttribute="leading" constant="15" id="8b6-JJ-GtC"/>
+                            <constraint firstItem="RMJ-Lz-b27" firstAttribute="trailing" secondItem="oxw-Z8-RZB" secondAttribute="trailing" id="G7I-SG-z24"/>
+                            <constraint firstItem="oxw-Z8-RZB" firstAttribute="top" secondItem="h3F-nD-cVG" secondAttribute="bottom" constant="12" id="NLY-Sp-QaL"/>
+                            <constraint firstItem="RMJ-Lz-b27" firstAttribute="top" secondItem="oxw-Z8-RZB" secondAttribute="bottom" constant="8" id="RU3-aC-TgA"/>
+                            <constraint firstAttribute="height" constant="316" id="h7n-03-d6Y"/>
+                            <constraint firstItem="h3F-nD-cVG" firstAttribute="centerX" secondItem="nWZ-KW-Fha" secondAttribute="centerX" id="s2L-cL-BKP"/>
+                            <constraint firstAttribute="trailing" secondItem="oxw-Z8-RZB" secondAttribute="trailing" constant="15" id="uQG-Xf-T7t"/>
+                            <constraint firstItem="h3F-nD-cVG" firstAttribute="top" secondItem="nWZ-KW-Fha" secondAttribute="top" constant="40" id="wh9-U2-3xr"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="nWZ-KW-Fha" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="EfG-6f-hvE"/>
+                    <constraint firstAttribute="trailing" secondItem="nWZ-KW-Fha" secondAttribute="trailing" id="KiR-IR-yO4"/>
+                    <constraint firstAttribute="bottom" secondItem="nWZ-KW-Fha" secondAttribute="bottom" id="Set-mP-udC"/>
+                    <constraint firstItem="nWZ-KW-Fha" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="kez-Wd-f3v"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
+            <connections>
+                <outlet property="subTitleLabel" destination="RMJ-Lz-b27" id="Jzl-Dv-l8P"/>
+                <outlet property="titleLabel" destination="oxw-Z8-RZB" id="7zL-ke-MMd"/>
+                <outlet property="tryBtn" destination="VYr-WY-Gh5" id="wMU-2w-Khz"/>
+            </connections>
+            <point key="canvasLocation" x="0.0" y="-12"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="icon_notice" width="80" height="80"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

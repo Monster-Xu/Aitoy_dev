@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="SFProRoundedRegular.otf">
+            <string>SFProRounded-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ComponentLicensesViewController">
+            <connections>
+                <outlet property="headerView" destination="XZi-56-CXp" id="oS5-3y-39a"/>
+                <outlet property="tableView" destination="xTi-Tv-AgR" id="JDG-X0-DpQ"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="xTi-Tv-AgR">
+                    <rect key="frame" x="0.0" y="118" width="393" height="666"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="Ebz-tx-4Yn"/>
+                        <outlet property="delegate" destination="-1" id="bOx-JQ-HIK"/>
+                    </connections>
+                </tableView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="xTi-Tv-AgR" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="bI2-lQ-WjK"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="xTi-Tv-AgR" secondAttribute="trailing" id="oii-dp-Hma"/>
+                <constraint firstItem="xTi-Tv-AgR" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="uQw-qy-YPF"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="xTi-Tv-AgR" secondAttribute="bottom" id="vGo-Ac-gbu"/>
+            </constraints>
+            <point key="canvasLocation" x="132" y="-11"/>
+        </view>
+        <view contentMode="scaleToFill" id="XZi-56-CXp">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="60"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yTo-c1-2Wr">
+                    <rect key="frame" x="15" y="5" width="83.333333333333329" height="50"/>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Version" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wZM-vy-oiE">
+                    <rect key="frame" x="108.33333333333334" y="5" width="83.333333333333343" height="50"/>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Licence" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wkZ-ze-VSE">
+                    <rect key="frame" x="201.66666666666666" y="5" width="82.999999999999972" height="50"/>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Has it been modified" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jNF-mA-BLX">
+                    <rect key="frame" x="294.66666666666669" y="5" width="83.333333333333314" height="50"/>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" red="0.90980392156862744" green="0.96470588235294119" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstItem="wkZ-ze-VSE" firstAttribute="top" secondItem="yTo-c1-2Wr" secondAttribute="top" id="1DT-pu-VuC"/>
+                <constraint firstItem="jNF-mA-BLX" firstAttribute="leading" secondItem="wkZ-ze-VSE" secondAttribute="trailing" constant="10" id="61c-wc-Eem"/>
+                <constraint firstItem="yTo-c1-2Wr" firstAttribute="top" secondItem="XZi-56-CXp" secondAttribute="top" constant="5" id="7Fp-yz-ePx"/>
+                <constraint firstItem="wZM-vy-oiE" firstAttribute="top" secondItem="yTo-c1-2Wr" secondAttribute="top" id="9Ck-7a-9E2"/>
+                <constraint firstAttribute="bottom" secondItem="yTo-c1-2Wr" secondAttribute="bottom" constant="5" id="Rq3-JD-2dI"/>
+                <constraint firstAttribute="trailing" secondItem="jNF-mA-BLX" secondAttribute="trailing" constant="15" id="Str-Kp-Ppq"/>
+                <constraint firstItem="yTo-c1-2Wr" firstAttribute="width" secondItem="wZM-vy-oiE" secondAttribute="width" id="VKG-hr-gdO"/>
+                <constraint firstItem="yTo-c1-2Wr" firstAttribute="width" secondItem="wkZ-ze-VSE" secondAttribute="width" id="Yzc-xJ-nm5"/>
+                <constraint firstItem="wZM-vy-oiE" firstAttribute="leading" secondItem="yTo-c1-2Wr" secondAttribute="trailing" constant="10" id="bNc-cU-tpk"/>
+                <constraint firstItem="yTo-c1-2Wr" firstAttribute="leading" secondItem="XZi-56-CXp" secondAttribute="leading" constant="15" id="cgJ-QP-8Tf"/>
+                <constraint firstItem="wZM-vy-oiE" firstAttribute="bottom" secondItem="yTo-c1-2Wr" secondAttribute="bottom" id="hnO-iF-Vod"/>
+                <constraint firstItem="wkZ-ze-VSE" firstAttribute="bottom" secondItem="yTo-c1-2Wr" secondAttribute="bottom" id="mhc-La-b9W"/>
+                <constraint firstItem="jNF-mA-BLX" firstAttribute="top" secondItem="wkZ-ze-VSE" secondAttribute="top" id="pxT-WX-KPw"/>
+                <constraint firstItem="wkZ-ze-VSE" firstAttribute="leading" secondItem="wZM-vy-oiE" secondAttribute="trailing" constant="10" id="qBJ-Aj-tJq"/>
+                <constraint firstItem="jNF-mA-BLX" firstAttribute="bottom" secondItem="wkZ-ze-VSE" secondAttribute="bottom" id="tKo-Kn-0kt"/>
+                <constraint firstItem="yTo-c1-2Wr" firstAttribute="width" secondItem="jNF-mA-BLX" secondAttribute="width" id="wI9-M1-2Y4"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="834" y="-126"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

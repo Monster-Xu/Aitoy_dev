@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="SFProRoundedMedium.ttf">
+            <string>SFRounded-Medium</string>
+        </array>
+        <array key="SFProRoundedRegular.otf">
+            <string>SFProRounded-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SetupDeviceVC">
+            <connections>
+                <outlet property="detaileLabel" destination="Qqh-Gn-XV2" id="8lk-RS-lNz"/>
+                <outlet property="imgView" destination="Qqh-Gn-XV2" id="twn-Vr-P1d"/>
+                <outlet property="resetBtn" destination="HXq-kZ-GJX" id="y0A-z0-VuC"/>
+                <outlet property="titleLabel" destination="I4B-2s-Kdh" id="ydD-7m-oWr"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="reset_Bg" translatesAutoresizingMaskIntoConstraints="NO" id="AAN-PE-E8k">
+                    <rect key="frame" x="32" y="238" width="329" height="243.33333333333337"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="AAN-PE-E8k" secondAttribute="height" multiplier="311:230" id="Afn-Ho-uIQ"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="16"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Long press the reset button(s) until the indicator light blinks (Subject to the instruction)" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qqh-Gn-XV2">
+                    <rect key="frame" x="32" y="505.33333333333331" width="329" height="38.333333333333314"/>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HXq-kZ-GJX">
+                    <rect key="frame" x="32" y="712" width="329" height="48"/>
+                    <color key="backgroundColor" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="48" id="UOP-x3-f0d"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="The Indicator Light is Blinking"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="24"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" red="0.1176470588" green="0.66666666669999997" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="connectBtnClick:" destination="-1" eventType="touchUpInside" id="dTE-Tf-uoQ"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8vS-aJ-zod">
+                    <rect key="frame" x="0.0" y="118" width="50" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="50" id="He2-T5-R9N"/>
+                        <constraint firstAttribute="height" constant="44" id="KNN-9P-QmU"/>
+                    </constraints>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" image="left_close"/>
+                    <connections>
+                        <action selector="resetBtnClick:" destination="-1" eventType="touchUpInside" id="mUA-Ay-Iug"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Set up the device" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="I4B-2s-Kdh">
+                    <rect key="frame" x="32" y="186" width="163.66666666666666" height="36"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="36" id="q39-op-eUI"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="SFRounded-Medium" family="SF Pro Rounded" pointSize="22"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="AAN-PE-E8k" firstAttribute="top" secondItem="I4B-2s-Kdh" secondAttribute="bottom" constant="16" id="10w-IT-bER"/>
+                <constraint firstItem="Qqh-Gn-XV2" firstAttribute="leading" secondItem="AAN-PE-E8k" secondAttribute="leading" id="CAx-OW-iwB"/>
+                <constraint firstItem="AAN-PE-E8k" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="32" id="CUl-vU-V43"/>
+                <constraint firstItem="I4B-2s-Kdh" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="32" id="CZQ-AI-aUj"/>
+                <constraint firstItem="8vS-aJ-zod" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="EAB-zi-IhJ"/>
+                <constraint firstItem="I4B-2s-Kdh" firstAttribute="top" secondItem="8vS-aJ-zod" secondAttribute="bottom" constant="24" id="IrE-68-xtK"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="AAN-PE-E8k" secondAttribute="trailing" constant="32" id="MwP-7d-DMK"/>
+                <constraint firstItem="HXq-kZ-GJX" firstAttribute="leading" secondItem="AAN-PE-E8k" secondAttribute="leading" id="Pnr-Rd-MOq"/>
+                <constraint firstItem="HXq-kZ-GJX" firstAttribute="trailing" secondItem="AAN-PE-E8k" secondAttribute="trailing" id="TKa-1f-oJm"/>
+                <constraint firstItem="8vS-aJ-zod" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="f2p-0L-Nko"/>
+                <constraint firstItem="Qqh-Gn-XV2" firstAttribute="top" secondItem="AAN-PE-E8k" secondAttribute="bottom" constant="24" id="hgo-R7-pfe"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="HXq-kZ-GJX" secondAttribute="bottom" constant="24" id="hpg-II-YA4"/>
+                <constraint firstItem="Qqh-Gn-XV2" firstAttribute="trailing" secondItem="AAN-PE-E8k" secondAttribute="trailing" id="rmT-89-8L2"/>
+            </constraints>
+            <point key="canvasLocation" x="-45.038167938931295" y="-12.67605633802817"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="left_close" width="28.333333969116211" height="28.333333969116211"/>
+        <image name="reset_Bg" width="175" height="115"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

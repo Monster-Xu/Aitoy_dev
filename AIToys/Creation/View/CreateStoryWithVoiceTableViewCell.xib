@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" rowHeight="117" id="KGk-i7-Jjw" customClass="CreateStoryWithVoiceTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="117"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="117"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YJj-7W-2kq">
+                        <rect key="frame" x="16" y="21" width="24" height="24"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" image="choose_normal"/>
+                        <state key="selected" image="choose_sel"/>
+                        <connections>
+                            <action selector="secletBtnClick:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Fmf-ZD-ZQ5"/>
+                        </connections>
+                    </button>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="默认头像" translatesAutoresizingMaskIntoConstraints="NO" id="GKe-VU-4jR">
+                        <rect key="frame" x="49" y="8" width="50" height="50"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="50" id="Jz1-G6-vb1"/>
+                            <constraint firstAttribute="height" constant="50" id="u4W-6K-ZAc"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wrp-da-YiZ">
+                        <rect key="frame" x="284" y="22" width="20" height="22"/>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" image="create_play"/>
+                        <state key="selected" image="create_pause"/>
+                        <connections>
+                            <action selector="playBtnClick:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="zXc-FW-clQ"/>
+                        </connections>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="l43-WI-mUu">
+                        <rect key="frame" x="115" y="22.666666666666671" width="42" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="create_new" translatesAutoresizingMaskIntoConstraints="NO" id="NGb-lU-Txo">
+                        <rect key="frame" x="68" y="2" width="40" height="16"/>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="GKe-VU-4jR" firstAttribute="leading" secondItem="YJj-7W-2kq" secondAttribute="trailing" constant="9" id="3Hy-0i-0jK"/>
+                    <constraint firstItem="NGb-lU-Txo" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="2" id="8MK-Wp-jGt"/>
+                    <constraint firstItem="NGb-lU-Txo" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="68" id="CDb-Cr-j0n"/>
+                    <constraint firstItem="l43-WI-mUu" firstAttribute="centerY" secondItem="YJj-7W-2kq" secondAttribute="centerY" id="HXX-0s-hPk"/>
+                    <constraint firstAttribute="trailing" secondItem="Wrp-da-YiZ" secondAttribute="trailing" constant="16" id="Nzi-nw-nca"/>
+                    <constraint firstItem="GKe-VU-4jR" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="RYz-S6-Pjj"/>
+                    <constraint firstItem="l43-WI-mUu" firstAttribute="leading" secondItem="GKe-VU-4jR" secondAttribute="trailing" constant="16" id="YOI-8F-pXk"/>
+                    <constraint firstItem="YJj-7W-2kq" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="ZWx-tn-l7a"/>
+                    <constraint firstItem="GKe-VU-4jR" firstAttribute="centerY" secondItem="YJj-7W-2kq" secondAttribute="centerY" id="eXk-g3-bfM"/>
+                    <constraint firstItem="Wrp-da-YiZ" firstAttribute="centerY" secondItem="YJj-7W-2kq" secondAttribute="centerY" id="hPY-CC-2Na"/>
+                    <constraint firstItem="Wrp-da-YiZ" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="lOQ-At-hae"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
+            <connections>
+                <outlet property="headerImageView" destination="GKe-VU-4jR" id="fJ0-Bg-uoE"/>
+                <outlet property="playBtn" destination="Wrp-da-YiZ" id="q6j-Mi-D4x"/>
+                <outlet property="selectBtn" destination="YJj-7W-2kq" id="cun-Ig-VuI"/>
+                <outlet property="voiceNameLabel" destination="l43-WI-mUu" id="hAV-vZ-F9q"/>
+                <outlet property="voiceNewImage" destination="NGb-lU-Txo" id="ihR-7x-cRc"/>
+            </connections>
+            <point key="canvasLocation" x="-324" y="-20"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="choose_normal" width="24" height="24"/>
+        <image name="choose_sel" width="24" height="24"/>
+        <image name="create_new" width="40" height="16"/>
+        <image name="create_pause" width="20" height="20"/>
+        <image name="create_play" width="24" height="24"/>
+        <image name="默认头像" width="25" height="25"/>
+    </resources>
+</document>

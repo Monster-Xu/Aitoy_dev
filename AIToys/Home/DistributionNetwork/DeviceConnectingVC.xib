@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="SFProRoundedMedium.ttf">
+            <string>SFRounded-Medium</string>
+        </array>
+        <array key="SFProRoundedRegular.otf">
+            <string>SFProRounded-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DeviceConnectingVC">
+            <connections>
+                <outlet property="imgView" destination="VIU-Xh-hQc" id="Bge-dL-4s6"/>
+                <outlet property="progressView" destination="sew-nM-3Tv" id="JlH-XH-oQe"/>
+                <outlet property="subTitleLabel" destination="Ysf-KC-NY0" id="Nol-YV-g2F"/>
+                <outlet property="titleLabel" destination="3SD-xU-Wlr" id="unU-18-7R2"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="故事机" translatesAutoresizingMaskIntoConstraints="NO" id="VIU-Xh-hQc">
+                    <rect key="frame" x="153.66666666666666" y="294" width="86" height="86"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="86" id="UCK-fv-L2O"/>
+                        <constraint firstAttribute="height" constant="86" id="ejl-7c-mR9"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="16"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5JE-Mz-Dnl">
+                    <rect key="frame" x="0.0" y="118" width="50" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="50" id="RcS-os-bHj"/>
+                        <constraint firstAttribute="height" constant="44" id="x4d-29-9f5"/>
+                    </constraints>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" image="left_close"/>
+                    <connections>
+                        <action selector="closeBtnClcik:" destination="-1" eventType="touchUpInside" id="nJS-63-fXQ"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="正在连接设备..." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3SD-xU-Wlr">
+                    <rect key="frame" x="32" y="186" width="329" height="36"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="36" id="Guw-h9-EC1"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="SFRounded-Medium" family="SF Pro Rounded" pointSize="22"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="保持设备处于通电状态" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ysf-KC-NY0">
+                    <rect key="frame" x="32" y="228" width="329" height="17"/>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="14"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.69999999999999996" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.29999999999999999" translatesAutoresizingMaskIntoConstraints="NO" id="sew-nM-3Tv">
+                    <rect key="frame" x="100" y="410" width="193" height="4"/>
+                    <color key="tintColor" red="0.054901960780000002" green="0.63529411759999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="4" id="5gN-WD-LMv"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="2"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </progressView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="3SD-xU-Wlr" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="32" id="2hT-s2-26B"/>
+                <constraint firstItem="Ysf-KC-NY0" firstAttribute="leading" secondItem="3SD-xU-Wlr" secondAttribute="leading" id="FKx-Cm-w6A"/>
+                <constraint firstItem="5JE-Mz-Dnl" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="Jks-e2-oLI"/>
+                <constraint firstItem="VIU-Xh-hQc" firstAttribute="top" secondItem="Ysf-KC-NY0" secondAttribute="bottom" constant="49" id="LDB-cb-OeK"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="3SD-xU-Wlr" secondAttribute="trailing" constant="32" id="RRN-Sj-omM"/>
+                <constraint firstItem="3SD-xU-Wlr" firstAttribute="top" secondItem="5JE-Mz-Dnl" secondAttribute="bottom" constant="24" id="dyq-ur-WPG"/>
+                <constraint firstItem="VIU-Xh-hQc" firstAttribute="centerX" secondItem="Q5M-cg-NOt" secondAttribute="centerX" id="eDP-T5-WfR"/>
+                <constraint firstItem="sew-nM-3Tv" firstAttribute="top" secondItem="VIU-Xh-hQc" secondAttribute="bottom" constant="30" id="pyF-FO-xel"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="sew-nM-3Tv" secondAttribute="trailing" constant="100" id="rms-IC-4dk"/>
+                <constraint firstItem="Ysf-KC-NY0" firstAttribute="trailing" secondItem="3SD-xU-Wlr" secondAttribute="trailing" id="sgE-Jc-9iw"/>
+                <constraint firstItem="5JE-Mz-Dnl" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="tYb-Ck-OVu"/>
+                <constraint firstItem="Ysf-KC-NY0" firstAttribute="top" secondItem="3SD-xU-Wlr" secondAttribute="bottom" constant="6" id="u0f-BZ-acO"/>
+                <constraint firstItem="sew-nM-3Tv" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="100" id="xSQ-pS-7FM"/>
+            </constraints>
+            <point key="canvasLocation" x="130.53435114503816" y="-11.267605633802818"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="left_close" width="28.333333969116211" height="28.333333969116211"/>
+        <image name="故事机" width="140" height="140"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

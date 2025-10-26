@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AddFamailyMemeberVC">
+            <connections>
+                <outlet property="accountAlertLab" destination="KNY-oX-ZAx" id="Xfb-Jo-NPl"/>
+                <outlet property="accountLabel" destination="GWk-xH-quU" id="Dc3-dP-FZS"/>
+                <outlet property="accountTextField" destination="ceS-5f-CYW" id="84k-Nh-TeK"/>
+                <outlet property="alertLabel" destination="KNY-oX-ZAx" id="0nv-5o-jOH"/>
+                <outlet property="nameLabel" destination="Vu2-Ea-VPd" id="Mam-hC-jxM"/>
+                <outlet property="nameTextField" destination="gy7-U8-FyJ" id="9zo-64-CgB"/>
+                <outlet property="roleNameLabel" destination="bL4-uz-1Bz" id="xtm-gi-HpL"/>
+                <outlet property="roleTitleLabel" destination="I5t-Ah-bwA" id="vo7-w8-LoC"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5t7-7C-MkL">
+                    <rect key="frame" x="0.0" y="133" width="393" height="64"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="名称" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vu2-Ea-VPd">
+                            <rect key="frame" x="15" y="22.333333333333343" width="32" height="19.333333333333329"/>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="请输入" textAlignment="right" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="gy7-U8-FyJ">
+                            <rect key="frame" x="62" y="0.0" width="316" height="64"/>
+                            <color key="textColor" white="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                            <textInputTraits key="textInputTraits"/>
+                        </textField>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="64" id="4P0-vm-7oa"/>
+                        <constraint firstItem="gy7-U8-FyJ" firstAttribute="leading" secondItem="Vu2-Ea-VPd" secondAttribute="trailing" constant="15" id="ORY-VP-xhc"/>
+                        <constraint firstItem="Vu2-Ea-VPd" firstAttribute="centerY" secondItem="5t7-7C-MkL" secondAttribute="centerY" id="Y0Y-Ki-vLR"/>
+                        <constraint firstAttribute="bottom" secondItem="gy7-U8-FyJ" secondAttribute="bottom" id="eWL-fg-uN2"/>
+                        <constraint firstItem="gy7-U8-FyJ" firstAttribute="top" secondItem="5t7-7C-MkL" secondAttribute="top" id="uDE-lU-Lq1"/>
+                        <constraint firstItem="Vu2-Ea-VPd" firstAttribute="leading" secondItem="5t7-7C-MkL" secondAttribute="leading" constant="15" id="yAd-eD-Beu"/>
+                        <constraint firstAttribute="trailing" secondItem="gy7-U8-FyJ" secondAttribute="trailing" constant="15" id="yLm-RA-5nu"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tM2-2S-9Y7">
+                    <rect key="frame" x="0.0" y="197" width="393" height="64"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="账号" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GWk-xH-quU">
+                            <rect key="frame" x="15" y="22.333333333333343" width="32" height="19.333333333333329"/>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="请输入" textAlignment="right" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="ceS-5f-CYW">
+                            <rect key="frame" x="62" y="0.0" width="316" height="64"/>
+                            <color key="textColor" white="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                            <textInputTraits key="textInputTraits" keyboardType="emailAddress"/>
+                        </textField>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="GWk-xH-quU" firstAttribute="leading" secondItem="tM2-2S-9Y7" secondAttribute="leading" constant="15" id="3Gp-U7-t7b"/>
+                        <constraint firstAttribute="height" constant="64" id="703-Pp-Pyj"/>
+                        <constraint firstItem="ceS-5f-CYW" firstAttribute="top" secondItem="tM2-2S-9Y7" secondAttribute="top" id="Cr5-yP-rE5"/>
+                        <constraint firstAttribute="bottom" secondItem="ceS-5f-CYW" secondAttribute="bottom" id="M3n-Ng-zQs"/>
+                        <constraint firstItem="GWk-xH-quU" firstAttribute="centerY" secondItem="tM2-2S-9Y7" secondAttribute="centerY" id="RJ3-Xu-9fv"/>
+                        <constraint firstItem="ceS-5f-CYW" firstAttribute="leading" secondItem="GWk-xH-quU" secondAttribute="trailing" constant="15" id="wUc-Ga-2Th"/>
+                        <constraint firstAttribute="trailing" secondItem="ceS-5f-CYW" secondAttribute="trailing" constant="15" id="xAv-Xs-qOx"/>
+                    </constraints>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="关联账号接受邀请后，才能成为家庭成员并使用相关功能。" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KNY-oX-ZAx">
+                    <rect key="frame" x="15" y="271" width="363" height="13.333333333333314"/>
+                    <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="11"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fC4-zB-TZV">
+                    <rect key="frame" x="0.0" y="299.33333333333331" width="393" height="64"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="家庭角色" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="I5t-Ah-bwA">
+                            <rect key="frame" x="14.999999999999996" y="22.333333333333371" width="63.666666666666657" height="19.333333333333329"/>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="16"/>
+                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Administrator" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bL4-uz-1Bz">
+                            <rect key="frame" x="285.66666666666669" y="23" width="92.333333333333314" height="18"/>
+                            <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="15"/>
+                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.5" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="I5t-Ah-bwA" firstAttribute="centerY" secondItem="fC4-zB-TZV" secondAttribute="centerY" id="0iI-fj-3WE"/>
+                        <constraint firstAttribute="height" constant="64" id="IDw-Nm-UfB"/>
+                        <constraint firstItem="bL4-uz-1Bz" firstAttribute="centerY" secondItem="fC4-zB-TZV" secondAttribute="centerY" id="YPZ-Yg-EjJ"/>
+                        <constraint firstItem="I5t-Ah-bwA" firstAttribute="leading" secondItem="fC4-zB-TZV" secondAttribute="leading" constant="15" id="tsu-OE-owF"/>
+                        <constraint firstAttribute="trailing" secondItem="bL4-uz-1Bz" secondAttribute="trailing" constant="15" id="zPl-oM-hXL"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Q5M-cg-NOt"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="KNY-oX-ZAx" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="15" id="186-Ju-hhl"/>
+                <constraint firstItem="fC4-zB-TZV" firstAttribute="top" secondItem="KNY-oX-ZAx" secondAttribute="bottom" constant="15" id="8g7-ic-3J8"/>
+                <constraint firstItem="5t7-7C-MkL" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" constant="15" id="D4w-af-Rml"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="5t7-7C-MkL" secondAttribute="trailing" id="EbE-Cp-w9b"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="fC4-zB-TZV" secondAttribute="trailing" id="HIP-F4-tXL"/>
+                <constraint firstItem="5t7-7C-MkL" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="NVt-N1-exT"/>
+                <constraint firstItem="KNY-oX-ZAx" firstAttribute="top" secondItem="tM2-2S-9Y7" secondAttribute="bottom" constant="10" id="PDN-9m-tVJ"/>
+                <constraint firstItem="tM2-2S-9Y7" firstAttribute="top" secondItem="5t7-7C-MkL" secondAttribute="bottom" id="ZQa-Iy-BCk"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="KNY-oX-ZAx" secondAttribute="trailing" constant="15" id="cim-EG-CD4"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="tM2-2S-9Y7" secondAttribute="trailing" id="l0R-VL-1Ut"/>
+                <constraint firstItem="fC4-zB-TZV" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="ofT-q9-hff"/>
+                <constraint firstItem="tM2-2S-9Y7" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="yk5-hD-AAE"/>
+            </constraints>
+            <point key="canvasLocation" x="132" y="-11"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

@@ -1,0 +1,23 @@
+{
+    "config": {
+        "appId": 852121569,
+        "thingAppKey": "us4nm48mewaesxx3qaq9",
+        "appScheme": "talenpal-test",
+        "hotspotPrefixs": ["SmartLife"],
+        "is_support_home_manager":true,
+        "device_detail_mini_program": true,
+        "disable_family_room":true,
+        "activator_auto_serach_capacity": {
+                            "searchTypeBle": true,
+                            "searchTypeEZ": true,
+                            "searchTypePegasus": true,
+                            "searchTypeWired": true,
+                            "searchTypeZigbee": true,
+                            "searchTypeMatter": true
+                    },
+    },
+   "colors":{
+        "themeColor": "#FF5A28",
+    }
+}
+
