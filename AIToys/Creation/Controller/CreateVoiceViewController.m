@@ -12,6 +12,7 @@
 #import "SelectIllustrationVC.h"
 #import "AFStoryAPIManager.h"
 #import "LGBaseAlertView.h"
+#import "SVProgressHUD.h"
 
 // ✅ VoiceModel便利方法扩展
 @interface VoiceModel (VoiceManagementExtensions)
@@ -72,6 +73,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *speekBtn;
 @property (weak, nonatomic) IBOutlet UILabel *voiceTextLabel;
 @property (weak, nonatomic) IBOutlet UILabel *speekLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *voiceGifImageView;
 @property (weak, nonatomic) IBOutlet UIButton *deletPickImageBtn;
 @property (weak, nonatomic) IBOutlet UITextField *voiceNameTextView;
 
@@ -128,11 +130,21 @@
 @property (nonatomic, copy) NSString *finalRecognizedText;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *faildViewConstraintHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topConstraint;
+@property (weak, nonatomic) IBOutlet UIView *faildView;
 
 @end
 
 @implementation CreateVoiceViewController
 
+-(void)viewWillAppear:(BOOL)animated{
+    // ✅ 如果是编辑模式，填充现有数据
+    if (self.isEditMode && self.editingVoice) {
+        [self populateEditingData];
+    }else{
+        self.faildView.hidden = YES;
+        
+    }
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -160,13 +172,7 @@
     [self setupVoiceTextLabel];
     [self setupTextFieldObservers];
     
-    // ✅ 如果是编辑模式，填充现有数据
-    if (self.isEditMode && self.editingVoice) {
-        [self populateEditingData];
-    }else{
-        self.faildViewConstraintHeight.constant = 0;
-        self.topConstraint.constant = 10;
-    }
+    
 }
 
 - (void)viewDidLayoutSubviews {
@@ -187,6 +193,14 @@
         // 确保在布局完成后设置正确的圆角半径
         if (self.speekBtn.layer.cornerRadius != CGRectGetWidth(self.speekBtn.frame) / 2.0) {
             self.speekBtn.layer.cornerRadius = CGRectGetWidth(self.speekBtn.frame) / 2.0;
+        }
+    }
+    
+    // ✅ 录音按钮布局完成后，创建进度条（只在需要时创建）
+    if (self.speekBtn && CGRectGetWidth(self.speekBtn.bounds) > 0) {
+        // 只有当进度条不存在且按钮有实际尺寸时才创建
+        if (!self.progressLayer || !self.backgroundLayer) {
+            [self createProgressLayers];
         }
     }
 }
@@ -332,8 +346,11 @@
     
     VoiceModel *voice = self.editingVoice;
     if (voice.cloneStatus!=3) {
-        self.faildViewConstraintHeight.constant = 0;
-        self.topConstraint.constant = 10;
+        self.faildView.hidden = YES;
+        
+    }else{
+        self.topConstraint.constant = 52;
+        self.faildView.hidden = NO;
     }
     
     // ✅ 首先保存原始数据用于变更比较
@@ -531,9 +548,9 @@
     self.navigationItem.hidesBackButton = YES;
     
     // 创建自定义返回按钮
-    UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [backButton setImage:[UIImage systemImageNamed:@"chevron.left"] forState:UIControlStateNormal];
-    [backButton setTintColor:[UIColor systemBlueColor]];
+    UIButton *backButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [backButton setImage:[UIImage imageNamed:@"icon_back"] forState:UIControlStateNormal];
+    [backButton setTintColor:[UIColor blackColor]];
     [backButton addTarget:self action:@selector(backButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     
     // 设置按钮大小
@@ -548,18 +565,18 @@
 }
 
 - (void)setupRecordingProgressLayer {
-    // 等待视图布局完成后再设置进度条
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self createProgressLayers];
-    });
+    // ✅ 不在这里立即创建进度条，而是等待布局完成
+    // 进度条的创建现在在 viewDidLayoutSubviews 中进行
+    NSLog(@"📋 录音进度条设置已准备，将在布局完成后创建");
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    // 确保在视图完全显示后再创建进度条
-    if (!self.progressLayer) {
+    // ✅ 确保在视图完全显示后进度条已正确创建
+    if (!self.progressLayer && self.speekBtn && CGRectGetWidth(self.speekBtn.bounds) > 0) {
         [self createProgressLayers];
+        NSLog(@"📐 在 viewDidAppear 中创建进度条");
     }
 }
 
@@ -589,26 +606,57 @@
 }
 
 - (void)createProgressLayers {
-    if (!self.speekBtn || self.progressLayer) {
+    NSLog(@"📐 createProgressLayers 被调用");
+    
+    if (!self.speekBtn) {
+        NSLog(@"⚠️ 录音按钮不存在，无法创建进度条");
         return;
     }
     
-    // 获取录音按钮的中心点和半径
-    CGPoint center = CGPointMake(CGRectGetMidX(self.speekBtn.bounds), CGRectGetMidY(self.speekBtn.bounds));
-    CGFloat radius = MAX(CGRectGetWidth(self.speekBtn.bounds), CGRectGetHeight(self.speekBtn.bounds)) / 2.0 + 8; // 比按钮大一点
+    // ✅ 检查是否已经有进度层，避免重复创建
+    if (self.progressLayer && self.backgroundLayer) {
+        NSLog(@"ℹ️ 进度条已存在，跳过重复创建");
+        return;
+    }
     
-    // 创建圆形路径
+    // 清理之前可能存在的进度层
+    [self removeExistingProgressLayers];
+    
+    // 确保按钮已经完成布局，获取实际的frame尺寸
+    [self.speekBtn layoutIfNeeded];
+    
+    // ✅ 获取录音按钮的实际尺寸和中心点
+    CGRect buttonFrame = self.speekBtn.bounds;
+    CGPoint center = CGPointMake(CGRectGetMidX(buttonFrame), CGRectGetMidY(buttonFrame));
+    
+    // ✅ 动态计算半径，适应不同的按钮尺寸
+    CGFloat buttonRadius = MIN(CGRectGetWidth(buttonFrame), CGRectGetHeight(buttonFrame)) / 2.0;
+    CGFloat progressRadius = buttonRadius + 8; // 进度条比按钮大8像素
+    
+    NSLog(@"📐 录音按钮尺寸信息:");
+    NSLog(@"   按钮Frame: %@", NSStringFromCGRect(buttonFrame));
+    NSLog(@"   中心点: %@", NSStringFromCGPoint(center));
+    NSLog(@"   按钮半径: %.1f", buttonRadius);
+    NSLog(@"   进度条半径: %.1f", progressRadius);
+    
+    // ✅ 验证按钮尺寸是否合理
+    if (buttonRadius < 5.0) {
+        NSLog(@"⚠️ 按钮尺寸过小，延迟创建进度条");
+        return;
+    }
+    
+    // 创建圆形路径 - 从12点钟方向开始
     UIBezierPath *circularPath = [UIBezierPath bezierPathWithArcCenter:center
-                                                                 radius:radius
-                                                             startAngle:-M_PI_2
-                                                               endAngle:3 * M_PI_2
+                                                                 radius:progressRadius
+                                                             startAngle:-M_PI_2  // 12点钟方向
+                                                               endAngle:3 * M_PI_2  // 顺时针一圈
                                                               clockwise:YES];
     
     // 创建背景层（灰色圆圈）
     self.backgroundLayer = [CAShapeLayer layer];
     self.backgroundLayer.path = circularPath.CGPath;
-    self.backgroundLayer.strokeColor = [UIColor colorWithWhite:0.9 alpha:0.5].CGColor;
-    self.backgroundLayer.lineWidth = 4.0;
+    self.backgroundLayer.strokeColor = [UIColor colorWithWhite:0.9 alpha:0.3].CGColor;
+    self.backgroundLayer.lineWidth = 3.0;
     self.backgroundLayer.fillColor = [UIColor clearColor].CGColor;
     self.backgroundLayer.lineCap = kCALineCapRound;
     self.backgroundLayer.hidden = YES; // 初始隐藏
@@ -617,15 +665,30 @@
     self.progressLayer = [CAShapeLayer layer];
     self.progressLayer.path = circularPath.CGPath;
     self.progressLayer.strokeColor = [UIColor systemPurpleColor].CGColor;
-    self.progressLayer.lineWidth = 4.0;
+    self.progressLayer.lineWidth = 3.0;
     self.progressLayer.fillColor = [UIColor clearColor].CGColor;
     self.progressLayer.lineCap = kCALineCapRound;
     self.progressLayer.strokeEnd = 0.0; // 初始为0
     self.progressLayer.hidden = YES; // 初始隐藏
     
-    // 添加到录音按钮的图层
+    // ✅ 添加到录音按钮的图层
     [self.speekBtn.layer addSublayer:self.backgroundLayer];
     [self.speekBtn.layer addSublayer:self.progressLayer];
+    
+    NSLog(@"✅ 录音进度条已创建并添加到按钮层");
+}
+
+/// ✅ 清理已存在的进度层
+- (void)removeExistingProgressLayers {
+    if (self.progressLayer) {
+        [self.progressLayer removeFromSuperlayer];
+        self.progressLayer = nil;
+    }
+    
+    if (self.backgroundLayer) {
+        [self.backgroundLayer removeFromSuperlayer];
+        self.backgroundLayer = nil;
+    }
 }
 
 #pragma mark - Button Actions
@@ -1562,6 +1625,8 @@
 
 
 - (void)startRecording {
+    NSLog(@"🎤 startRecording 被调用");
+    
     // ✅ 如果是编辑成功状态的音色，不允许录音
     if (self.isEditMode && self.editingVoice && self.editingVoice.cloneStatus == VoiceCloneStatusSuccess) {
         NSLog(@"⚠️ 成功状态的音色不允许重新录音");
@@ -1569,35 +1634,73 @@
     }
     
     if (self.isRecording) {
+        NSLog(@"⚠️ 录音已在进行中，忽略重复请求");
         return;
     }
     
-    // 重置label为录音状态
-    self.speekLabel.text = @"按住开始录音";
+    NSLog(@"🎤 开始录音流程");
     
+    // ✅ 简化权限检查，避免异步调用导致的问题
     // 检查语音识别权限
-    if ([SFSpeechRecognizer authorizationStatus] != SFSpeechRecognizerAuthorizationStatusAuthorized) {
+    SFSpeechRecognizerAuthorizationStatus speechStatus = [SFSpeechRecognizer authorizationStatus];
+    if (speechStatus != SFSpeechRecognizerAuthorizationStatusAuthorized) {
+        NSLog(@"⚠️ 语音识别权限未授权，状态: %ld", (long)speechStatus);
         [self showAlert:@"请在设置中允许语音识别权限"];
         return;
     }
     
-    // 请求录音权限
-    [[AVAudioSession sharedInstance] requestRecordPermission:^(BOOL granted) {
-        if (!granted) {
+    // 检查录音权限
+    AVAudioSessionRecordPermission recordPermission = [[AVAudioSession sharedInstance] recordPermission];
+    if (recordPermission == AVAudioSessionRecordPermissionDenied) {
+        NSLog(@"⚠️ 录音权限被拒绝");
+        [self showAlert:@"请在设置中允许麦克风权限"];
+        return;
+    } else if (recordPermission == AVAudioSessionRecordPermissionUndetermined) {
+        NSLog(@"⚠️ 录音权限未确定，需要请求权限");
+        // 请求录音权限
+        [[AVAudioSession sharedInstance] requestRecordPermission:^(BOOL granted) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self showAlert:@"请在设置中允许麦克风权限"];
+                if (granted) {
+                    NSLog(@"✅ 录音权限获取成功，开始录音");
+                    [self beginRecordingSession];
+                } else {
+                    NSLog(@"❌ 录音权限被拒绝");
+                    [self showAlert:@"请在设置中允许麦克风权限"];
+                }
             });
-            return;
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self beginRecordingSession];
-        });
-    }];
+        }];
+        return;
+    }
+    
+    // 权限都已授权，直接开始录音
+    NSLog(@"✅ 所有权限已授权，开始录音会话");
+    [self beginRecordingSession];
 }
 
 /// ✅ 修改：录音过程中不显示识别文字，录音结束才回显
 - (void)beginRecordingSession {
+    NSLog(@"🎙️ beginRecordingSession 开始");
+    
+    // ✅ 防止重复调用
+    if (self.isRecording) {
+        NSLog(@"⚠️ 录音会话已在进行中，忽略重复调用");
+        return;
+    }
+    
+    // ✅ 立即设置录音状态，防止重复调用
+    self.isRecording = YES;
+    self.remainingTime = 30;
+    self.recordedTime = 0;
+    self.finalRecognizedText = nil;
+    
+    NSLog(@"🔄 开始录音前的清理工作");
+    
+    // ✅ 开始录音前，重置按钮状态（如果之前显示过处理动画）
+    [self resetRecordingButton];
+    
+    // 重置label为录音状态
+    self.speekLabel.text = @"准备录音...";
+    
     // 取消之前的任务
     if (self.recognitionTask) {
         [self.recognitionTask cancel];
@@ -1610,6 +1713,8 @@
         [self.audioEngine.inputNode removeTapOnBus:0];
     }
     
+    NSLog(@"🔊 配置音频会话");
+    
     // 配置音频会话
     NSError *error = nil;
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
@@ -1620,6 +1725,7 @@
     
     if (error) {
         NSLog(@"❌ 音频会话配置失败: %@", error);
+        self.isRecording = NO; // 重置状态
         [self showAlert:@"录音初始化失败，请重试"];
         return;
     }
@@ -1628,15 +1734,20 @@
     
     if (error) {
         NSLog(@"❌ 音频会话激活失败: %@", error);
+        self.isRecording = NO; // 重置状态
         [self showAlert:@"录音初始化失败，请重试"];
         return;
     }
+    
+    NSLog(@"📁 设置录音文件路径");
     
     // 设置录音文件路径
     NSString *documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
     NSString *audioFileName = [NSString stringWithFormat:@"voice_recording_%@.m4a", [self currentTimestamp]];
     NSString *audioFilePath = [documentsPath stringByAppendingPathComponent:audioFileName];
     self.audioFileURL = [NSURL fileURLWithPath:audioFilePath];
+    
+    NSLog(@"📁 录音文件将保存到: %@", self.audioFileURL.path);
     
     // 配置录音设置
     NSDictionary *recordSettings = @{
@@ -1646,6 +1757,8 @@
         AVEncoderAudioQualityKey: @(AVAudioQualityHigh)
     };
     
+    NSLog(@"🎙️ 初始化录音器");
+    
     // 初始化录音器
     self.audioRecorder = [[AVAudioRecorder alloc] initWithURL:self.audioFileURL 
                                                       settings:recordSettings 
@@ -1653,25 +1766,32 @@
     
     if (error) {
         NSLog(@"❌ 录音器初始化失败: %@", error);
+        self.isRecording = NO; // 重置状态
         [self showAlert:@"录音器初始化失败，请重试"];
         return;
     }
     
     if (![self.audioRecorder prepareToRecord]) {
         NSLog(@"❌ 录音器准备失败");
+        self.isRecording = NO; // 重置状态
         [self showAlert:@"录音器准备失败，请重试"];
         return;
     }
     
     if (![self.audioRecorder record]) {
         NSLog(@"❌ 录音启动失败");
+        self.isRecording = NO; // 重置状态
         [self showAlert:@"录音启动失败，请重试"];
         return;
     }
     
+    NSLog(@"✅ 录音器启动成功");
+    
     // 创建识别请求
     self.recognitionRequest = [[SFSpeechAudioBufferRecognitionRequest alloc] init];
     self.recognitionRequest.shouldReportPartialResults = YES;
+    
+    NSLog(@"🗣️ 启动语音识别");
     
     // ✅ 使用 @try-@catch 保护音频引擎操作
     @try {
@@ -1716,21 +1836,19 @@
         
         if (!engineStarted || error) {
             NSLog(@"❌ 音频引擎启动失败: %@", error.localizedDescription);
-            [self showAlert:@"语音识别启动失败，仅录音功能可用"];
-            // 即使语音识别失败，也可以继续录音
+            // 语音识别失败不应该阻止录音
+        } else {
+            NSLog(@"✅ 音频引擎启动成功");
         }
         
     } @catch (NSException *exception) {
         NSLog(@"❌ 音频引擎异常: %@", exception.reason);
-        [self showAlert:@"语音识别启动失败，仅录音功能可用"];
-        // 继续录音流程
+        // 继续录音流程，即使语音识别失败
     }
     
+    NSLog(@"🎬 录音正式开始");
+    
     // 更新UI状态
-    self.isRecording = YES;
-    self.remainingTime = 30; // 最少需要录30秒
-    self.recordedTime = 0;
-    self.finalRecognizedText = nil; // 清空之前的识别结果
     self.speekLabel.text = @"录音中,松开结束录音(0s)";
     
     // 显示进度条
@@ -1742,6 +1860,8 @@
                                                       selector:@selector(updateRecordingTime) 
                                                       userInfo:nil 
                                                        repeats:YES];
+    
+    NSLog(@"✅ 录音会话完全启动成功");
 }
 
 - (void)updateVoiceTextLabelHeight:(NSString *)text {
@@ -1850,8 +1970,9 @@
 - (void)handleShortRecording {
     NSLog(@"⚠️ 录音时间不足30秒 (实际: %lds)", (long)self.recordedTime);
     
-    // 显示提示
-    [self showAlert:@"录音时间太短，至少需要30秒"];
+    // ✅ 使用SVProgressHUD显示提示
+    [SVProgressHUD showErrorWithStatus:@"录音时间太短，至少需要30秒"];
+    [SVProgressHUD dismissWithDelay:2.0];
     
     // 删除录音文件
     if (self.audioFileURL) {
@@ -1860,7 +1981,18 @@
         NSLog(@"🗑️ 已删除短录音文件");
     }
     
-    // 不回显识别文本，保持原有状态
+    // ✅ 停止并清理计时器
+    if (self.recordTimer) {
+        [self.recordTimer invalidate];
+        self.recordTimer = nil;
+    }
+    
+    // ✅ 重置录音相关状态
+    self.recordedTime = 0;
+    self.remainingTime = 30;
+    self.finalRecognizedText = nil;
+    
+    // 恢复录音标签文字
     self.speekLabel.text = @"按住开始录音";
 }
 
@@ -1880,15 +2012,11 @@
         self.hasUnsavedChanges = YES;
     }
     
-    // ✅ 回显识别到的文本（如果有）
-    if (self.finalRecognizedText && self.finalRecognizedText.length > 0) {
-        self.voiceTextLabel.text = self.finalRecognizedText;
-        self.placeholderLabel.hidden = YES;
-        [self updateVoiceTextLabelHeight:self.finalRecognizedText];
-        NSLog(@"📝 回显识别文本: %@", self.finalRecognizedText);
-    } else {
-        NSLog(@"⚠️ 没有识别到文本，保持原有显示");
-    }
+    // ✅ 不再回显识别到的文本，保持当前显示
+    NSLog(@"ℹ️ 录音完成，不回显识别文本");
+    
+    // ✅ 录音完成后，将按钮变为声音处理gif图
+    [self showSoundProcessingAnimation];
     
     // 显示录音完成提示
     self.speekLabel.text = @"声音克隆预计需要3-5mins 可先保存即可";
@@ -1930,6 +2058,11 @@
     
     // 安全停止音频引擎
     [self stopAudioEngine];
+    
+    // ✅ 当录音时间不足时，重置按钮状态
+    if (self.recordedTime < 30) {
+        [self resetRecordingButton];
+    }
 }
 
 #pragma mark - Alert Methods
@@ -1969,23 +2102,129 @@
 
 #pragma mark - Helper Methods
 
+/// ✅ 显示声音处理动画
+- (void)showSoundProcessingAnimation {
+    // 禁用录音按钮的所有手势，避免在处理动画期间重新录音
+    self.speekBtn.userInteractionEnabled = NO;
+    // 隐藏进度条
+    [self hideRecordingProgress];
+    self.voiceGifImageView.hidden = NO;
+    // 加载本地 GIF
+    NSString *gifPath = [[NSBundle mainBundle] pathForResource:@"声音处理" ofType:@"gif"];
+    NSURL *gifURL = [NSURL fileURLWithPath:gifPath];
+
+    [self.voiceGifImageView sd_setImageWithURL:gifURL completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+        if (image) {
+            
+            self.speekBtn.hidden = YES;
+            
+        }
+    }];
+    
+    
+    // 可选：添加按钮点击提示，告诉用户正在处理
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(processingButtonTapped:)];
+    [self.speekBtn addGestureRecognizer:tapGesture];
+}
+
+
+
+
+
+/// ✅ 处理中按钮被点击时的提示
+- (void)processingButtonTapped:(UITapGestureRecognizer *)gesture {
+    // 显示处理中的提示
+    [self showAlert:@"声音正在处理中，请稍候..."];
+}
+
+/// ✅ 重置录音按钮到初始状态（在需要重新录音时调用）
+- (void)resetRecordingButton {
+    NSLog(@"🔄 resetRecordingButton 被调用");
+    
+    // ✅ 如果正在录音，不要重置
+    if (self.isRecording) {
+        NSLog(@"⚠️ 正在录音中，跳过按钮重置");
+        return;
+    }
+    
+    NSLog(@"🔄 开始重置录音按钮状态");
+    self.voiceGifImageView.hidden = YES;
+    // 1. 移除处理动画
+    if (self.speekBtn.imageView.layer) {
+        [self.speekBtn.imageView.layer removeAnimationForKey:@"rotationAnimation"];
+    }
+    
+    // 2. 移除点击手势（处理状态的点击手势）
+    NSArray *gestures = [self.speekBtn.gestureRecognizers copy];
+    for (UIGestureRecognizer *gesture in gestures) {
+        if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
+            [self.speekBtn removeGestureRecognizer:gesture];
+        }
+    }
+    
+    // 3. 重新启用长按手势（录音手势）
+    for (UIGestureRecognizer *gesture in self.speekBtn.gestureRecognizers) {
+        if ([gesture isKindOfClass:[UILongPressGestureRecognizer class]]) {
+            gesture.enabled = YES;
+        }
+    }
+    
+    // 4. 恢复原始的录音按钮外观
+    UIImage *defaultRecordImage = [UIImage imageNamed:@"create_voiceclone"];
+    if (defaultRecordImage) {
+        [self.speekBtn setImage:defaultRecordImage forState:UIControlStateNormal];
+    } else {
+        // 如果找不到图片，使用系统麦克风图标
+        UIImage *micImage = [UIImage systemImageNamed:@"mic.circle.fill"];
+        [self.speekBtn setImage:micImage forState:UIControlStateNormal];
+        [self.speekBtn setTintColor:[UIColor systemBlueColor]];
+    }
+    
+    [self.speekBtn setTitle:nil forState:UIControlStateNormal];
+    [self.speekBtn setBackgroundImage:nil forState:UIControlStateNormal];
+    
+    // 5. 重新启用用户交互
+    self.speekBtn.userInteractionEnabled = YES;
+    
+    // 6. 确保按钮可见
+    self.speekBtn.hidden = NO;
+    self.speekBtn.alpha = 1.0;
+    
+    // 7. 确保进度条被隐藏和重置
+    [self hideRecordingProgress];
+    
+    NSLog(@"✅ 录音按钮状态已重置为初始状态");
+}
+
 #pragma mark - Recording Progress Methods
 
 - (void)showRecordingProgress {
+    // ✅ 确保进度条已正确创建
     if (!self.progressLayer || !self.backgroundLayer) {
         [self createProgressLayers];
     }
     
     // 显示进度条
-    self.backgroundLayer.hidden = NO;
-    self.progressLayer.hidden = NO;
-    
-    // 重置进度
-    self.progressLayer.strokeEnd = 0.0;
+    if (self.backgroundLayer && self.progressLayer) {
+        self.backgroundLayer.hidden = NO;
+        self.progressLayer.hidden = NO;
+        
+        // 重置进度
+        self.progressLayer.strokeEnd = 0.0;
+        NSLog(@"✅ 录音进度条已显示");
+    } else {
+        NSLog(@"⚠️ 进度条创建失败，无法显示进度");
+    }
 }
 
 - (void)updateRecordingProgress:(CGFloat)progress {
-    if (!self.progressLayer) return;
+    if (!self.progressLayer) {
+        NSLog(@"⚠️ 进度条不存在，无法更新进度");
+        return;
+    }
+    
+    // ✅ 限制进度范围
+    progress = MAX(0.0, MIN(1.0, progress));
     
     // 更新进度条
     [CATransaction begin];
@@ -1994,22 +2233,28 @@
     [CATransaction commit];
     
     // 根据进度改变颜色
+    UIColor *strokeColor;
     if (progress < 0.5) {
         // 前30秒，橙色到紫色渐变
-        self.progressLayer.strokeColor = [UIColor systemOrangeColor].CGColor;
+        strokeColor = [UIColor systemOrangeColor];
     } else {
         // 30秒后，紫色
-        self.progressLayer.strokeColor = [UIColor systemPurpleColor].CGColor;
+        strokeColor = [UIColor systemPurpleColor];
     }
+    
+    self.progressLayer.strokeColor = strokeColor.CGColor;
 }
 
 - (void)hideRecordingProgress {
     // 隐藏进度条
-    self.backgroundLayer.hidden = YES;
-    self.progressLayer.hidden = YES;
-    
-    // 重置进度
-    self.progressLayer.strokeEnd = 0.0;
+    if (self.backgroundLayer) {
+        self.backgroundLayer.hidden = YES;
+    }
+    if (self.progressLayer) {
+        self.progressLayer.hidden = YES;
+        // 重置进度
+        self.progressLayer.strokeEnd = 0.0;
+    }
 }
 
 
@@ -2043,14 +2288,7 @@
     
     // 清理进度条
     @try {
-        if (self.progressLayer) {
-            [self.progressLayer removeFromSuperlayer];
-            self.progressLayer = nil;
-        }
-        if (self.backgroundLayer) {
-            [self.backgroundLayer removeFromSuperlayer];
-            self.backgroundLayer = nil;
-        }
+        [self removeExistingProgressLayers];
     } @catch (NSException *exception) {
         NSLog(@"⚠️ 清理进度条异常: %@", exception.reason);
     }

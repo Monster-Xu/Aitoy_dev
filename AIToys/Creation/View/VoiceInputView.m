@@ -10,7 +10,7 @@
 #import <Speech/Speech.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface VoiceInputView () <AVAudioRecorderDelegate>
+@interface VoiceInputView () <AVAudioRecorderDelegate, CAAnimationDelegate>
 
 @property (nonatomic, strong) UIView *backgroundView;
 @property (nonatomic, strong) UIView *containerView;
@@ -32,6 +32,13 @@
 @property (nonatomic, strong) SFSpeechRecognitionTask *recognitionTask;
 @property (nonatomic, strong) AVAudioInputNode *audioInputNode;
 
+// 波纹效果属性
+@property (nonatomic, strong) NSMutableArray<CAShapeLayer *> *rippleLayers;
+@property (nonatomic, strong) NSTimer *rippleTimer;
+@property (nonatomic, strong) UIColor *rippleColor;
+@property (nonatomic, assign) CGFloat maxRippleRadius;
+@property (nonatomic, assign) NSTimeInterval rippleAnimationDuration;
+
 @end
 
 @implementation VoiceInputView
@@ -45,6 +52,13 @@
         self.cancelBlock = cancelBlock;
         self.currentState = VoiceInputStateReady;
         self.recognizedText = @"";
+        
+        // 初始化波纹效果属性
+        self.rippleLayers = [NSMutableArray array];
+        self.rippleColor = [UIColor colorWithRed:0.2 green:0.6 blue:1.0 alpha:1.0];
+        self.rippleAnimationDuration = 1.5;
+        self.maxRippleRadius = 120;
+        
         [self setupUI];
         [self setupConstraints];
     }
@@ -53,6 +67,7 @@
 
 - (void)dealloc {
     [self cleanupAudio];
+    [self stopRippleAnimation];
 }
 
 #pragma mark - UI设置
@@ -93,6 +108,7 @@
     self.voiceButton = [[UIButton alloc] init];
     self.voiceButton.backgroundColor = [UIColor colorWithRed:0.2 green:0.6 blue:1.0 alpha:1.0];
     self.voiceButton.layer.cornerRadius = 40;
+    self.voiceButton.clipsToBounds = NO; // 允许波纹超出按钮边界
     [self.voiceButton setImage:[UIImage systemImageNamed:@"mic.fill"] forState:UIControlStateNormal];
     [self.voiceButton setTintColor:[UIColor whiteColor]];
     
@@ -283,11 +299,13 @@
 - (void)voiceButtonPressed {
     NSLog(@"🎤 按下麦克风按钮");
     
-    // 视觉反馈
+    // 视觉反馈 - 只缩放，不变色
     [UIView animateWithDuration:0.1 animations:^{
-        self.voiceButton.transform = CGAffineTransformMakeScale(1.1, 1.1);
-        self.voiceButton.backgroundColor = [UIColor colorWithRed:1.0 green:0.3 blue:0.3 alpha:1.0]; // 变红色
+        self.voiceButton.transform = CGAffineTransformMakeScale(0.95, 0.95);
     }];
+    
+    // 开始波纹动画
+    [self startRippleAnimation];
     
     [self checkAndStartRecording];
 }
@@ -296,11 +314,13 @@
 - (void)voiceButtonReleased {
     NSLog(@"🎤 释放麦克风按钮");
     
-    // 恢复按钮外观
+    // 恢复按钮外观 - 只恢复尺寸
     [UIView animateWithDuration:0.2 animations:^{
         self.voiceButton.transform = CGAffineTransformIdentity;
-        self.voiceButton.backgroundColor = [UIColor colorWithRed:0.2 green:0.6 blue:1.0 alpha:1.0]; // 恢复蓝色
     }];
+    
+    // 停止波纹动画
+    [self stopRippleAnimation];
     
     if (self.currentState == VoiceInputStateRecording) {
         [self stopRecording];
@@ -512,6 +532,108 @@
     
     UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
     [rootVC presentViewController:alert animated:YES completion:nil];
+}
+
+#pragma mark - 波纹动画效果
+
+- (void)startRippleAnimation {
+    // 立即创建第一个波纹
+    [self createRipple];
+    
+    // 设置定时器持续创建波纹
+    self.rippleTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(createRipple) userInfo:nil repeats:YES];
+}
+
+- (void)stopRippleAnimation {
+    [self.rippleTimer invalidate];
+    self.rippleTimer = nil;
+    
+    // 移除所有波纹图层
+    for (CAShapeLayer *layer in self.rippleLayers) {
+        [layer removeFromSuperlayer];
+    }
+    [self.rippleLayers removeAllObjects];
+}
+
+- (void)createRipple {
+    CAShapeLayer *rippleLayer = [CAShapeLayer layer];
+    
+    // 获取按钮在容器视图中的中心点
+    CGPoint buttonCenterInContainer = CGPointMake(
+        CGRectGetMidX(self.voiceButton.frame),
+        CGRectGetMidY(self.voiceButton.frame)
+    );
+    
+    CGFloat initialRadius = CGRectGetWidth(self.voiceButton.frame) / 2.0;
+    
+    // 以(0,0)为中心创建路径，稍后通过position属性定位
+    UIBezierPath *initialPath = [UIBezierPath bezierPathWithArcCenter:CGPointZero
+                                                               radius:initialRadius
+                                                           startAngle:0
+                                                             endAngle:M_PI * 2
+                                                            clockwise:YES];
+    
+    UIBezierPath *finalPath = [UIBezierPath bezierPathWithArcCenter:CGPointZero
+                                                             radius:self.maxRippleRadius
+                                                         startAngle:0
+                                                           endAngle:M_PI * 2
+                                                          clockwise:YES];
+    
+    rippleLayer.path = initialPath.CGPath;
+    rippleLayer.fillColor = [UIColor clearColor].CGColor;
+    rippleLayer.strokeColor = self.rippleColor.CGColor;
+    rippleLayer.lineWidth = 2.0;
+    rippleLayer.opacity = 0.8;
+    
+    // 设置波纹图层的位置为按钮中心
+    rippleLayer.position = buttonCenterInContainer;
+    
+    // 将波纹添加到容器视图，确保在按钮下方
+    [self.containerView.layer insertSublayer:rippleLayer below:self.voiceButton.layer];
+    
+    [self.rippleLayers addObject:rippleLayer];
+    
+    // 创建动画组
+    CAAnimationGroup *animationGroup = [CAAnimationGroup animation];
+    animationGroup.duration = self.rippleAnimationDuration;
+    animationGroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+    animationGroup.removedOnCompletion = NO;
+    animationGroup.fillMode = kCAFillModeForwards;
+    
+    // 路径动画（扩散）
+    CABasicAnimation *pathAnimation = [CABasicAnimation animationWithKeyPath:@"path"];
+    pathAnimation.fromValue = (__bridge id)initialPath.CGPath;
+    pathAnimation.toValue = (__bridge id)finalPath.CGPath;
+    
+    // 透明度动画（渐隐）
+    CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    opacityAnimation.fromValue = @0.8;
+    opacityAnimation.toValue = @0.0;
+    
+    // 线宽动画（变细）
+    CABasicAnimation *lineWidthAnimation = [CABasicAnimation animationWithKeyPath:@"lineWidth"];
+    lineWidthAnimation.fromValue = @2.0;
+    lineWidthAnimation.toValue = @0.5;
+    
+    animationGroup.animations = @[pathAnimation, opacityAnimation, lineWidthAnimation];
+    
+    // 动画完成后移除图层
+    animationGroup.delegate = self;
+    [rippleLayer setValue:rippleLayer forKey:@"rippleLayer"];
+    
+    [rippleLayer addAnimation:animationGroup forKey:@"ripple"];
+}
+
+#pragma mark - CAAnimationDelegate
+
+- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag {
+    if (flag) {
+        CAShapeLayer *rippleLayer = [anim valueForKey:@"rippleLayer"];
+        if (rippleLayer) {
+            [rippleLayer removeFromSuperlayer];
+            [self.rippleLayers removeObject:rippleLayer];
+        }
+    }
 }
 
 @end

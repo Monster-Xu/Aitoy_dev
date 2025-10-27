@@ -97,6 +97,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifiHavenOpen) name:NetworkReachableWifi object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(bluetoothStateChanged:) name:@"BluetoothStateChanged" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(faildBack) name:@"faildBackChange" object:nil];
+    
     [self setupPemissionData];
 }
 
@@ -109,14 +111,14 @@
 
 //获取数据
 - (void)getData{
-    WEAK_SELF
-    [[APIManager shared] GET:[APIPortConfiguration getDoolModelListUrl] parameter:nil success:^(id  _Nonnull result, id  _Nonnull data, NSString * _Nonnull msg) {
-        NSArray *dataArr = data;
-        weakSelf.recommendDeviceList = [NSMutableArray arrayWithArray:[FindDollModel mj_objectArrayWithKeyValuesArray:dataArr]];
-        [weakSelf.tableView reloadData];
-    } failure:^(NSError * _Nonnull error, NSString * _Nonnull msg) {
-        
-    }];
+//    WEAK_SELF
+//    [[APIManager shared] GET:[APIPortConfiguration getDoolModelListUrl] parameter:nil success:^(id  _Nonnull result, id  _Nonnull data, NSString * _Nonnull msg) {
+//        NSArray *dataArr = data;
+//        weakSelf.recommendDeviceList = [NSMutableArray arrayWithArray:[FindDollModel mj_objectArrayWithKeyValuesArray:dataArr]];
+//        [weakSelf.tableView reloadData];
+//    } failure:^(NSError * _Nonnull error, NSString * _Nonnull msg) {
+//        
+//    }];
 }
 
 //- (void)getToken {
@@ -395,7 +397,10 @@
     self.wifiIsOpen = YES;
     [self setupPemissionData];
 }
-
+//失败返回
+-(void)faildBack{
+    [self startScan];
+}
 //检查蓝牙弹窗
 - (void)chenckBluetoothAlert{
     WEAK_SELF

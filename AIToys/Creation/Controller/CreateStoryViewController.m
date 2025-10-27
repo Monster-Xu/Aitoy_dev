@@ -75,6 +75,11 @@
 // Bottom Button
 @property (nonatomic, strong) UIButton *nextButton;
 
+// Failure Banner
+@property (nonatomic, strong) UIView *failureBannerView;
+@property (nonatomic, strong) UIImageView *failureIconImageView;
+@property (nonatomic, strong) UILabel *failureMessageLabel;
+
 // Data
 @property (nonatomic, strong) UIImage *selectedImage;
 @property (nonatomic, copy) NSString *selectedIllustrationUrl;
@@ -115,6 +120,9 @@
     // ✅ UI 创建完成后，如果有传入的故事模型，设置表单数据
     if (self.storyModel) {
         [self setupFormWithStoryModel:self.storyModel];
+    } else {
+        // 如果没有故事模型，确保隐藏失败横幅
+        [self hideFailureBanner];
     }
     
     // 添加键盘通知
@@ -252,7 +260,11 @@
     self.scrollView.showsVerticalScrollIndicator = YES;
     [self.view addSubview:self.scrollView];
     
+    // Setup failure banner first (but initially hidden)
+    [self setupFailureBanner];
+    
     [self.scrollView mas_makeConstraints:^(MASConstraintMaker *make) {
+        // 默认情况下紧贴安全区域顶部，如果显示失败横幅会动态调整
         make.top.equalTo(self.view.mas_safeAreaLayoutGuideTop);
         make.left.right.equalTo(self.view);
         make.bottom.equalTo(self.view).offset(-90);
@@ -289,6 +301,48 @@
 }
 
 #pragma mark - Setup Sections
+
+- (void)setupFailureBanner {
+    // 失败横幅容器
+    self.failureBannerView = [[UIView alloc] init];
+    self.failureBannerView.backgroundColor = [UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:0.2];
+    self.failureBannerView.layer.cornerRadius = 16;
+    self.failureBannerView.layer.masksToBounds = YES;
+    self.failureBannerView.hidden = YES; // 默认隐藏
+    [self.view addSubview:self.failureBannerView];
+    
+    [self.failureBannerView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.view.mas_safeAreaLayoutGuideTop).offset(10);
+        make.left.equalTo(self.view).offset(16);
+        make.right.equalTo(self.view).offset(-16);
+        make.height.mas_equalTo(32);
+    }];
+    
+    // 失败图标
+    self.failureIconImageView = [[UIImageView alloc] init];
+    self.failureIconImageView.image = [UIImage imageNamed:@"失败"];
+    self.failureIconImageView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.failureBannerView addSubview:self.failureIconImageView];
+    
+    [self.failureIconImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.failureBannerView).offset(16);
+        make.centerY.equalTo(self.failureBannerView);
+        make.width.height.mas_equalTo(20); // 适当的图标大小
+    }];
+    
+    // 失败提示文字
+    self.failureMessageLabel = [[UILabel alloc] init];
+    self.failureMessageLabel.text = @"生成失败，请重新尝试";
+    self.failureMessageLabel.font = [UIFont systemFontOfSize:14];
+    self.failureMessageLabel.textColor = [UIColor systemRedColor];
+    [self.failureBannerView addSubview:self.failureMessageLabel];
+    
+    [self.failureMessageLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.failureIconImageView.mas_right).offset(10);
+        make.centerY.equalTo(self.failureBannerView);
+        make.right.lessThanOrEqualTo(self.failureBannerView).offset(-16);
+    }];
+}
 
 - (void)setupThemeSection {
     // 白色卡片容器
@@ -1211,6 +1265,13 @@
 - (void)setupFormWithStoryModel:(VoiceStoryModel *)storyModel {
     NSLog(@"🔄 设置表单字段 - 故事: %@, 状态: %ld", storyModel.storyName, (long)storyModel.storyStatus);
     
+    // 检查故事状态，如果是生成失败，显示失败横幅
+    if (storyModel.storyStatus == StoryStatusGenerateFailed || storyModel.storyStatus == StoryStatusAudioFailed) {
+        [self showFailureBanner];
+    } else {
+        [self hideFailureBanner];
+    }
+    
     [self setFormFieldsWithStoryModel:storyModel];
 }
 
@@ -1258,6 +1319,36 @@
     self.title = @"Edit Story";
     
     NSLog(@"🎯 表单字段设置完成");
+}
+
+#pragma mark - Failure Banner Methods
+
+/// 显示失败横幅
+- (void)showFailureBanner {
+    self.failureBannerView.hidden = NO;
+    
+    // 调整 ScrollView 的 top 约束，为横幅留出空间
+    [self.scrollView mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.failureBannerView.mas_bottom).offset(8); // 横幅下方8pt间距
+        make.left.right.equalTo(self.view);
+        make.bottom.equalTo(self.view).offset(-90);
+    }];
+    
+    NSLog(@"⚠️ 显示失败横幅");
+}
+
+/// 隐藏失败横幅
+- (void)hideFailureBanner {
+    self.failureBannerView.hidden = YES;
+    
+    // 恢复 ScrollView 的默认约束
+    [self.scrollView mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.view.mas_safeAreaLayoutGuideTop);
+        make.left.right.equalTo(self.view);
+        make.bottom.equalTo(self.view).offset(-90);
+    }];
+    
+    NSLog(@"✅ 隐藏失败横幅");
 }
 
 /// 根据故事长度设置对应的选项

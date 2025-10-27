@@ -28,10 +28,12 @@
                 <outlet property="storyTextField" destination="goa-wh-pQu" id="eBa-AY-A2Z"/>
                 <outlet property="storyThemeView" destination="62J-69-Jwf" id="6YQ-af-nca"/>
                 <outlet property="storyView" destination="BRh-ya-U8H" id="u28-Qc-eIn"/>
+                <outlet property="storyViewHeight" destination="ann-me-BNu" id="Iki-4J-pl1"/>
                 <outlet property="stroryThemeTextView" destination="4RH-Go-JMw" id="6n0-Jo-FBH"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
                 <outlet property="voiceHeaderImageBtn" destination="ylC-9S-QSd" id="L95-MN-Zan"/>
                 <outlet property="voiceHeaderView" destination="31B-SX-Ena" id="0bV-2m-36t"/>
+                <outlet property="voiceListViewHeight" destination="IEq-AF-Obo" id="fh8-9y-f4S"/>
                 <outlet property="voiceTabelView" destination="HkI-3Y-7JM" id="TYv-fJ-y1S"/>
             </connections>
         </placeholder>
@@ -129,7 +131,7 @@
                     </userDefinedRuntimeAttributes>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yY8-4j-i6p">
-                    <rect key="frame" x="16" y="466" width="361" height="295"/>
+                    <rect key="frame" x="16" y="466" width="361" height="280"/>
                     <subviews>
                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="create_chooseVoice" translatesAutoresizingMaskIntoConstraints="NO" id="xFf-aw-Xsn">
                             <rect key="frame" x="17" y="15" width="20" height="20"/>
@@ -161,16 +163,16 @@
                             </connections>
                         </button>
                         <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="HkI-3Y-7JM">
-                            <rect key="frame" x="16" y="51" width="329" height="234"/>
+                            <rect key="frame" x="16" y="51" width="329" height="219"/>
                         </tableView>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OQL-X8-37d">
-                            <rect key="frame" x="0.0" y="37" width="361" height="258"/>
+                            <rect key="frame" x="0.0" y="37" width="361" height="243"/>
                             <subviews>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="create_empty" translatesAutoresizingMaskIntoConstraints="NO" id="B65-Ec-Ra3">
-                                    <rect key="frame" x="97.666666666666686" y="67" width="166" height="124"/>
+                                    <rect key="frame" x="97.666666666666686" y="59.666666666666629" width="166" height="124"/>
                                 </imageView>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="暂无音色" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uK5-zv-IWV">
-                                    <rect key="frame" x="150.66666666666666" y="206" width="60" height="47"/>
+                                    <rect key="frame" x="150.66666666666666" y="198.66666666666663" width="60" height="39.333333333333343"/>
                                     <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="15"/>
                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.24799185739436619" colorSpace="custom" customColorSpace="sRGB"/>
                                     <nil key="highlightedColor"/>
@@ -191,6 +193,7 @@
                         <constraint firstItem="HkI-3Y-7JM" firstAttribute="leading" secondItem="yY8-4j-i6p" secondAttribute="leading" constant="16" id="2IL-hp-Adf"/>
                         <constraint firstItem="uRd-NY-5zs" firstAttribute="centerY" secondItem="xFf-aw-Xsn" secondAttribute="centerY" id="5wc-OK-5kA"/>
                         <constraint firstAttribute="trailing" secondItem="HkI-3Y-7JM" secondAttribute="trailing" constant="16" id="64e-ux-ruB"/>
+                        <constraint firstAttribute="height" constant="280" id="IEq-AF-Obo"/>
                         <constraint firstItem="xFf-aw-Xsn" firstAttribute="top" secondItem="yY8-4j-i6p" secondAttribute="top" constant="15" id="N2C-J7-CSF"/>
                         <constraint firstAttribute="bottom" secondItem="OQL-X8-37d" secondAttribute="bottom" id="UdI-Ir-BXa"/>
                         <constraint firstItem="OQL-X8-37d" firstAttribute="top" secondItem="Skh-XF-beh" secondAttribute="bottom" id="V6s-eX-Yur"/>
@@ -301,7 +304,6 @@
                 <constraint firstItem="xCG-VL-qab" firstAttribute="leading" secondItem="Mqj-Be-7er" secondAttribute="trailing" constant="15" id="EEi-tC-FDz"/>
                 <constraint firstItem="xCG-VL-qab" firstAttribute="centerY" secondItem="Mqj-Be-7er" secondAttribute="centerY" id="F5R-3x-Cah"/>
                 <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="yY8-4j-i6p" secondAttribute="trailing" constant="16" id="FHt-h3-aLF"/>
-                <constraint firstItem="xCG-VL-qab" firstAttribute="top" secondItem="yY8-4j-i6p" secondAttribute="bottom" constant="20" id="GYo-Ud-iXe"/>
                 <constraint firstItem="yY8-4j-i6p" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="16" id="H47-tp-0QL"/>
                 <constraint firstItem="31B-SX-Ena" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="16" id="H4C-Od-VGY"/>
                 <constraint firstItem="BRh-ya-U8H" firstAttribute="top" secondItem="31B-SX-Ena" secondAttribute="bottom" constant="10" id="JA0-BX-f3e"/>

@@ -243,6 +243,9 @@
         case 3:
             [self configureStatus3State]; // 失败状态，需要编辑跳转到 CreateStoryVC
             break;
+        case 4:
+            [self configureAudioGeneratingState]; // 音频生成中
+            break;
         case 5:
             [self configureStatus5State]; // 可播放状态，跳转到 CreateStoryWithVoiceVC
             break;
@@ -264,6 +267,9 @@
     self.statusView.layer.cornerRadius = 4;
     self.statusLabel.text = @"  Story Generation...";
     self.statusLabel.textColor = [UIColor colorWithRed:1.0 green:0.6 blue:0.0 alpha:1.0]; // 橙色文字
+    
+    // 确保显示副标题
+    self.subtitleLabel.hidden = NO;
     
     // 设置声音信息
     if (self.model.voiceName && self.model.voiceName.length > 0 && ![self.model.voiceName isEqualToString:@"--"]) {
@@ -288,9 +294,44 @@
     self.shouldJumpToVoiceVC = NO;
 }
 
+- (void)configureAudioGeneratingState {
+    // ⭐️ 音频生成中状态：显示生成横幅和音色名称
+    self.statusView.hidden = NO;
+    self.statusView.backgroundColor = [UIColor colorWithRed:1.0 green:0.95 blue:0.8 alpha:1.0]; // 浅橙色
+    self.statusView.layer.cornerRadius = 4;
+    self.statusLabel.text = @"  Audio Generation...";
+    self.statusLabel.textColor = [UIColor colorWithRed:1.0 green:0.6 blue:0.0 alpha:1.0]; // 橙色文字
+    
+    // 设置声音信息 - 确保显示音色名称
+    if (self.model.voiceName && self.model.voiceName.length > 0 && ![self.model.voiceName isEqualToString:@"--"]) {
+        self.subtitleLabel.text = [NSString stringWithFormat:@"Voice - %@", self.model.voiceName];
+        self.subtitleLabel.textColor = [UIColor systemBlueColor];
+        self.subtitleLabel.hidden = NO;
+    } else {
+        self.subtitleLabel.text = @"No-Voice";
+        self.subtitleLabel.textColor = [UIColor systemGrayColor];
+        self.subtitleLabel.hidden = NO;
+    }
+    
+    // 禁用播放按钮
+    self.playButton.enabled = NO;
+    [self.playButton setImage:[UIImage imageNamed:@"create_display"] forState:UIControlStateNormal];
+    self.playButton.tintColor = [UIColor colorWithWhite:0.9 alpha:1];
+    
+    // 禁用编辑按钮
+    self.editButton.enabled = NO;
+    [self.editButton setImage:[UIImage imageNamed:@"create_disedit"] forState:UIControlStateNormal];
+    self.editButton.tintColor = [UIColor colorWithWhite:0.9 alpha:1];
+    
+    // 音频生成中时不设置跳转目标
+    self.shouldJumpToVoiceVC = NO;
+}
+
 - (void)configureStatus2State {
     // status = 2: 编辑和点击跳转到 CreateStoryWithVoiceVC，播放按钮不可用
     self.statusView.hidden = YES;
+    self.subtitleLabel.hidden = NO;
+    
     // 设置声音信息
     if (self.model.voiceName && self.model.voiceName.length > 0 && ![self.model.voiceName isEqualToString:@"--"]) {
         self.subtitleLabel.text = [NSString stringWithFormat:@"Voice - %@", self.model.voiceName];
@@ -299,6 +340,7 @@
         self.subtitleLabel.text = @"No-Voice";
         self.subtitleLabel.textColor = [UIColor systemGrayColor];
     }
+    
     // 显示编辑按钮并启用
     self.editButton.hidden = NO;
     self.editButton.enabled = YES;
@@ -321,11 +363,8 @@
     self.statusLabel.text = @"   Failed, Try Again";
     self.statusLabel.textColor = [UIColor systemRedColor];
     
-    // 显示编辑按钮并启用
-    self.editButton.hidden = NO;
-    self.editButton.enabled = YES;
-    [self.editButton setImage:[UIImage imageNamed:@"create_edit"] forState:UIControlStateNormal];
-    self.editButton.tintColor = [UIColor systemGrayColor];
+    // 确保显示副标题
+    self.subtitleLabel.hidden = NO;
     
     // 设置声音信息
     if (self.model.voiceName && self.model.voiceName.length > 0 && ![self.model.voiceName isEqualToString:@"--"]) {
@@ -335,6 +374,12 @@
         self.subtitleLabel.text = @"No-Voice";
         self.subtitleLabel.textColor = [UIColor systemGrayColor];
     }
+    
+    // 显示编辑按钮并启用
+    self.editButton.hidden = NO;
+    self.editButton.enabled = YES;
+    [self.editButton setImage:[UIImage imageNamed:@"create_edit"] forState:UIControlStateNormal];
+    self.editButton.tintColor = [UIColor systemGrayColor];
     
     // 播放按钮不可用
     self.playButton.enabled = NO;

@@ -56,7 +56,6 @@
 @property (nonatomic, assign) CGRect originalFrame;
 @property (nonatomic, strong) UIPanGestureRecognizer *panGesture;
 
-// 拖动行为控制属性已在头文件中声明，这里不需要重复声明
 // 新增内部拖动相关属性
 @property (nonatomic, assign) CGFloat dragResistanceEdge;    // 边缘阻力系数
 @property (nonatomic, assign) CGFloat dragDecelerationRate;  // 减速系数
@@ -963,7 +962,17 @@
         [self updateProgress];
     }
 }
-
+-(void)rePlay{
+    if (self.audioPlayer) {
+        [self.audioPlayer stop];
+        self.audioPlayer.currentTime = 0;
+        [self stopProgressTimer];
+        [self updatePlayButtonImage:NO];
+        [self updateProgress];
+        [self play];
+    }
+    
+}
 - (BOOL)isPlaying {
     return self.audioPlayer.isPlaying;
 }
@@ -1070,9 +1079,11 @@
 #pragma mark - Actions
 
 - (void)playButtonTapped {
-    if (self.audioPlayer.isPlaying) {
+    if (!self.audioPlayer.isPlaying &&self.audioPlayer.currentTime>=60) {
+        [self rePlay];
+    } else if(self.audioPlayer.isPlaying){
         [self pause];
-    } else {
+    }else{
         [self play];
     }
 }

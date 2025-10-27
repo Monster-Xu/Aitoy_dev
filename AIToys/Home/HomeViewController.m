@@ -104,9 +104,16 @@ static const CGFloat JXPageheightForHeaderInSection = 100;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self getData];
+    if (self.currentAudioPlayer) {
+        [self.currentAudioPlayer play];
+    }
     [self becomeFirstResponder];// 激活第一响应者
 }
-
+-(void)viewWillDisappear:(BOOL)animated{
+    if (self.currentAudioPlayer) {
+        [self.currentAudioPlayer pause];
+    }
+}
 - (void)dealloc{
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"HomeDeviceRefresh" object:nil];
 }
@@ -1508,6 +1515,9 @@ static const CGFloat JXPageheightForHeaderInSection = 100;
 
 - (void)audioPlayerDidUpdateProgress:(CGFloat)progress currentTime:(NSTimeInterval)currentTime totalTime:(NSTimeInterval)totalTime {
     // 可以用来更新UI进度等
+    if (currentTime>=60) {
+        [self.currentAudioPlayer pause];
+    }
 }
 
 - (void)audioPlayerDidClose {

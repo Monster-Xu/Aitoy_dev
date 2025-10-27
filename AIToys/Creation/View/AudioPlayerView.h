@@ -41,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)play;
 - (void)pause;
 - (void)stop;
+-(void)rePlay;
 
 // 是否正在播放
 - (BOOL)isPlaying;

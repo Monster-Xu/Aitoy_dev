@@ -18,28 +18,21 @@
     self.fd_prefersNavigationBarHidden = YES;
     // Do any additional setup after loading the view from its nib.
 }
-//上传wifi信息
-- (void)modifySettingWithParam:(NSDictionary *)param{
-    [[APIManager shared] POSTJSON:[APIPortConfiguration getAppPropertyCreateUrl] parameter:param success:^(id  _Nonnull result, id  _Nonnull data, NSString * _Nonnull msg) {
-
-        NSLog(@"上传信息%@",result);
-
-    } failure:^(NSError * _Nonnull error, NSString * _Nonnull msg) {
-        NSLog(@"上传失败");
-    }];
-}
 - (IBAction)closeBtnClick:(id)sender {
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
 - (IBAction)backBtnClick:(id)sender {
     
-    
     [self.navigationController popViewControllerAnimated:YES];
 }
 - (IBAction)restartClick:(id)sender {
+    
+    
+    
     // 返回到FindDeviceViewController
     for (UIViewController *controller in self.navigationController.viewControllers) {
         if ([controller isKindOfClass:NSClassFromString(@"FindDeviceViewController")]) {
+           [[NSNotificationCenter defaultCenter] postNotificationName:@"faildBackChange" object:nil];
             [self.navigationController popToViewController:controller animated:YES];
             return;
         }

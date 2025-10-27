@@ -663,8 +663,8 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
         // ✅ 使用 section 而不是 row
         VoiceStoryModel *model = self.dataSource[indexPath.section];
         
-        // 如果是生成中或失败状态，需要额外的空间显示状态提示
-        if (model.storyStatus == 1 || model.storyStatus == 3) {
+        // 如果是生成中、音频生成中或失败状态，需要额外的空间显示状态提示
+        if (model.storyStatus == 1 || model.storyStatus == 3 || model.storyStatus == 4) {
             return 108; // 卡片内容高度，无上下边距
         }
         

@@ -29,7 +29,9 @@
 @property (weak, nonatomic) IBOutlet UIView *storyView;
 @property (weak, nonatomic) IBOutlet UIView *chooseVoiceView;
 @property (weak, nonatomic) IBOutlet UIButton *deletBtn;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *storyViewHeight;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *voiceListViewHeight;
 // 数据源
 @property (nonatomic, strong) NSMutableArray *voiceListArray;  // 音色列表数据
 @property (nonatomic, strong) VoiceStoryModel *currentStory;   // 当前故事模型
@@ -51,6 +53,9 @@
 //所有音色数量
 @property(nonatomic,assign)NSInteger voiceCount;
 
+// ✅ 滚动视图属性
+@property (nonatomic, strong) UIScrollView *mainScrollView;
+@property (nonatomic, strong) UIView *contentView;
 
 @end
 
@@ -70,10 +75,18 @@
     [super viewDidLoad];
     
     // 根据编辑模式设置标题
-    self.title = self.isEditMode ? @"Edit Story" : @"Create Story";
+//    self.title = self.isEditMode ? @"Edit Story" : @"Create Story";
+    self.title = @"Edit Story";
     
     self.view.backgroundColor = [UIColor colorWithRed:0xF6/255.0 green:0xF7/255.0 blue:0xFB/255.0 alpha:1.0];
     [self.navigationController.navigationBar setBarTintColor:[UIColor colorWithRed:0xF6/255.0 green:0xF7/255.0 blue:0xFB/255.0 alpha:1.0]];
+    
+    // ✅ 设置滚动视图
+    [self setupScrollView];
+    
+    // ✅ 添加键盘通知监听
+    [self setupKeyboardNotifications];
+    
     self.voiceTabelView.delegate = self;
     self.voiceTabelView.dataSource = self;
     self.addNewVoiceBtn.borderWidth = 1;
@@ -108,6 +121,25 @@
     if (self.audioPlayerView && self.audioPlayerView.isPlaying) {
         [self.audioPlayerView pause];
         NSLog(@"⏸️ 离开页面，暂停音频播放");
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    // ✅ 页面显示完成后再次更新滚动视图内容大小
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self updateScrollViewContentSize];
+    });
+}
+
+/// ✅ 页面即将显示时刷新数据（从其他页面返回时）
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    // 如果已经加载过数据，检查是否需要刷新音色列表（可能添加了新音色）
+    if (self.voiceListArray.count > 0) {
+        [self refreshVoiceListIfNeeded];
     }
 }
 
@@ -177,6 +209,10 @@
     } completion:^(BOOL finished) {
         if (finished) {
             NSLog(@"🎉 内容显示动画完成");
+            // ✅ 动画完成后更新滚动视图内容大小
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self updateScrollViewContentSize];
+            });
         }
     }];
 }
@@ -211,6 +247,11 @@
             strongSelf.stroryThemeTextView.text = story.storyName;
             [strongSelf.voiceHeaderImageBtn sd_setImageWithURL:[NSURL URLWithString:story.illustrationUrl] forState:UIControlStateNormal];
             strongSelf.storyTextField.text = story.storyContent;
+            
+            // ✅ 故事内容加载完成后，动态调整高度
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [strongSelf adjustStoryViewHeight];
+            });
             
             // ✅ 编辑模式下设置文本变化监听
             if (strongSelf.isEditMode) {
@@ -271,12 +312,35 @@
                 
                 // ✅ 编辑模式下设置当前选中的音色（如果有）
                 if (strongSelf.isEditMode && strongSelf.currentStory.voiceId > 0) {
-                    [strongSelf selectVoiceWithId:strongSelf.currentStory.voiceId];
-                    NSLog(@"🎯 编辑模式：尝试选中音色ID: %ld", (long)strongSelf.currentStory.voiceId);
+                    NSLog(@"🎯 编辑模式：准备匹配音色ID: %ld", (long)strongSelf.currentStory.voiceId);
+                    NSLog(@"🎯 当前过滤后的音色数量: %ld", (long)strongSelf.voiceListArray.count);
+                    
+                    // ✅ 延迟执行匹配，确保数据加载完成
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [strongSelf selectVoiceWithId:strongSelf.currentStory.voiceId];
+                        
+                        // ✅ 匹配完成后检查结果
+                        if (strongSelf.selectedVoiceIndex >= 0) {
+                            NSLog(@"✅ 音色匹配成功，选中索引: %ld", (long)strongSelf.selectedVoiceIndex);
+                        } else {
+                            NSLog(@"❌ 音色匹配失败，可能原因:");
+                            NSLog(@"   1. 音色ID %ld 不在可用列表中", (long)strongSelf.currentStory.voiceId);
+                            NSLog(@"   2. 音色的 cloneStatus 不等于 2");
+                            NSLog(@"   3. 数据同步问题");
+                            
+                            // ✅ 尝试备用匹配策略
+                            [strongSelf tryFallbackVoiceSelection];
+                        }
+                    });
                 }
                 
                 // 刷新TableView
                 [strongSelf.voiceTabelView reloadData];
+                
+                // ✅ TableView数据变化后，动态调整高度（包括音色区域）
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [strongSelf updateScrollViewContentSizeWithVoiceHeightRecalc:YES];
+                });
                 
                 // ✅ 确保选中状态正确显示
                 if (strongSelf.selectedVoiceIndex >= 0) {
@@ -291,6 +355,11 @@
             NSLog(@"✅ 成功加载 %ld 个音色", (long)strongSelf.voiceListArray.count);
         } else {
             NSLog(@"⚠️ 音色列表为空");
+            dispatch_async(dispatch_get_main_queue(), ^{
+                strongSelf.emptyView.hidden = NO;
+                // ✅ 空数据时也要调整高度（包括音色区域）
+                [strongSelf updateScrollViewContentSizeWithVoiceHeightRecalc:YES];
+            });
         }
         
         dispatch_group_leave(group);
@@ -418,6 +487,11 @@
             
             // 刷新TableView更新其他cell的状态
             [strongSelf.voiceTabelView reloadData];
+            
+            // ✅ 注释掉：选择音色时不需要调整ScrollView高度，因为内容数量没有变化
+            // dispatch_async(dispatch_get_main_queue(), ^{
+            //     [strongSelf updateScrollViewContentSize];
+            // });
         };
     }
     
@@ -459,6 +533,11 @@
     
     // 刷新tableView显示选中状态
     [tableView reloadData];
+    
+    // ✅ 注释掉：选择音色时不需要调整ScrollView高度，因为内容数量没有变化
+    // dispatch_async(dispatch_get_main_queue(), ^{
+    //     [self updateScrollViewContentSize];
+    // });
 }
 
 #pragma mark - Audio Control Methods
@@ -506,7 +585,7 @@
         self.audioPlayerView.delegate = self;
     }
     
-    // 显示播放器
+    // ✅ 显示播放器 - 现在在根视图上显示，不在滚动视图中
     CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
     [self.audioPlayerView showInView:self.view withFrame:CGRectMake(16, screenHeight-290, screenWidth-32, 70)];
@@ -571,6 +650,350 @@
     self.audioPlayerView = nil;
 }
 
+#pragma mark - ScrollView Setup
+
+/// ✅ 设置主滚动视图 - 将整个view包装到ScrollView中
+- (void)setupScrollView {
+    // 获取当前view的父视图
+    UIView *parentView = self.view.superview;
+    
+    // 创建主滚动视图
+    self.mainScrollView = [[UIScrollView alloc] init];
+    self.mainScrollView.frame = self.view.frame;
+    self.mainScrollView.backgroundColor = self.view.backgroundColor;
+    self.mainScrollView.showsVerticalScrollIndicator = YES;
+    self.mainScrollView.showsHorizontalScrollIndicator = NO;
+    self.mainScrollView.bounces = YES;
+    self.mainScrollView.alwaysBounceVertical = YES;
+    self.mainScrollView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag; // 拖动时隐藏键盘
+    
+    // 保存原有view作为内容视图
+    self.contentView = self.view;
+    
+    // 创建新的根视图
+    UIView *newRootView = [[UIView alloc] initWithFrame:self.view.frame];
+    newRootView.backgroundColor = self.view.backgroundColor;
+    
+    // 将ScrollView添加到新的根视图中
+    [newRootView addSubview:self.mainScrollView];
+    
+    // 将原有的view添加到ScrollView中
+    [self.mainScrollView addSubview:self.contentView];
+    
+    // 替换视图控制器的view
+    self.view = newRootView;
+    
+    // 设置ScrollView的frame填满新的根视图
+    self.mainScrollView.frame = newRootView.bounds;
+    self.mainScrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    // ✅ 延迟计算内容大小，让布局完成后再设置
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateScrollViewContentSize];
+    });
+    
+    NSLog(@"✅ 滚动视图设置完成 - 保持原有XIB约束");
+}
+
+
+- (void)updateScrollViewContentSize {
+    [self updateScrollViewContentSizeWithVoiceHeightRecalc:YES];
+}
+
+/// ✅ 更新滚动视图内容大小 - 控制是否重新计算音色区域高度
+- (void)updateScrollViewContentSizeWithVoiceHeightRecalc:(BOOL)shouldRecalcVoiceHeight {
+    if (!self.contentView) {
+        return;
+    }
+    
+    // 强制布局更新
+    [self.contentView layoutIfNeeded];
+    
+    // ✅ 动态调整故事内容区域的高度
+    [self adjustStoryViewHeight];
+    
+    // ✅ 只有在必要时才重新计算音色选择区域的高度
+    if (shouldRecalcVoiceHeight) {
+        [self adjustVoiceSelectionViewHeight];
+    }
+    
+    // 再次强制布局更新，确保约束变化生效
+    [self.contentView layoutIfNeeded];
+    
+    // 计算所有子视图的最大底部位置
+    CGFloat maxY = 0;
+    for (UIView *subview in self.contentView.subviews) {
+        if (!subview.hidden && subview.alpha > 0) {
+            CGFloat bottom = CGRectGetMaxY(subview.frame);
+            if (bottom > maxY) {
+                maxY = bottom;
+            }
+        }
+    }
+    
+    // 添加一些底部边距，确保有足够的滚动空间
+    maxY += 100;
+    
+    // 确保内容高度至少比屏幕高度大一些，这样才能滚动
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+    CGFloat contentHeight = MAX(maxY, screenHeight + 50);
+    
+    // 设置内容视图的frame大小
+    CGRect contentFrame = self.contentView.frame;
+    contentFrame.size.height = contentHeight;
+    self.contentView.frame = contentFrame;
+    
+    // 设置ScrollView的内容大小
+    self.mainScrollView.contentSize = CGSizeMake(self.contentView.frame.size.width, contentHeight);
+    
+    NSLog(@"📏 滚动视图内容大小设置为: %.1f x %.1f (计算最大Y: %.1f, 屏幕高度: %.1f)", 
+          self.mainScrollView.contentSize.width, self.mainScrollView.contentSize.height, maxY, screenHeight);
+}
+
+/// ✅ 动态调整故事内容区域的高度 - 使用约束
+- (void)adjustStoryViewHeight {
+    if (!self.storyViewHeight) {
+        NSLog(@"⚠️ storyViewHeight约束未绑定");
+        return;
+    }
+    
+    // 获取故事内容
+    NSString *storyContent = self.storyTextField.text ?: @"";
+    if (storyContent.length == 0) {
+        NSLog(@"📖 故事内容为空，使用默认高度");
+        return;
+    }
+    
+    // 计算文本所需的高度
+    CGFloat textViewWidth = self.storyTextField.frame.size.width;
+    if (textViewWidth <= 0) {
+        textViewWidth = [UIScreen mainScreen].bounds.size.width - 32; // 默认宽度
+    }
+    
+    // 减去内边距
+    CGFloat contentWidth = textViewWidth - self.storyTextField.textContainerInset.left - self.storyTextField.textContainerInset.right;
+    
+    // 计算文本高度
+    UIFont *font = self.storyTextField.font ?: [UIFont systemFontOfSize:16.0];
+    CGRect textRect = [storyContent boundingRectWithSize:CGSizeMake(contentWidth, CGFLOAT_MAX)
+                                                 options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
+                                              attributes:@{NSFontAttributeName: font}
+                                                 context:nil];
+    
+    // 添加内边距和一些额外空间
+    CGFloat requiredTextHeight = ceil(textRect.size.height);
+    CGFloat topBottomPadding = self.storyTextField.textContainerInset.top + self.storyTextField.textContainerInset.bottom;
+    CGFloat totalTextHeight = requiredTextHeight + topBottomPadding + 20; // 额外20pt空间
+    
+    // 设置最小和最大高度
+    CGFloat minHeight = 120.0; // 最小高度
+    CGFloat maxHeight = 400.0; // 最大高度，避免过高
+    
+    CGFloat newHeight = MAX(minHeight, MIN(totalTextHeight, maxHeight));
+    
+    // 更新约束常量
+    self.storyViewHeight.constant = newHeight;
+    
+    // 动画更新布局
+    [UIView animateWithDuration:0.3 animations:^{
+        [self.contentView layoutIfNeeded];
+    }];
+    
+    NSLog(@"📖 动态调整故事内容区域完成:");
+    NSLog(@"   故事内容长度: %ld", (long)storyContent.length);
+    NSLog(@"   计算文本高度: %.1f", requiredTextHeight);
+    NSLog(@"   storyViewHeight约束: %.1f", newHeight);
+}
+
+/// ✅ 动态调整音色选择区域的高度 - 使用约束
+- (void)adjustVoiceSelectionViewHeight {
+    if (!self.voiceListViewHeight) {
+        NSLog(@"⚠️ voiceListViewHeight约束未绑定");
+        return;
+    }
+    
+    // 计算TableView需要的高度
+    NSInteger cellCount = self.voiceListArray.count;
+    CGFloat cellHeight = 64.0; // 每个cell的高度
+    CGFloat newHeight = 0;
+    
+    if (cellCount > 0) {
+        // 有数据时按cell数量计算高度
+        newHeight = cellCount * cellHeight;
+        
+        // 设置一个最大高度限制，避免TableView过高
+        CGFloat maxHeight = 5 * cellHeight; // 最多显示5个cell的高度
+        newHeight = MIN(newHeight, maxHeight);
+        
+        // 添加一些内边距
+        newHeight += 60.0; // 顶部和底部各20pt的边距
+        
+        self.emptyView.hidden = YES;
+        NSLog(@"📊 有音色数据，计算高度: %.1f", newHeight);
+    } else {
+        // 没有数据时显示空视图，设置最小高度
+        newHeight = 160.0; // 空状态的最小高度
+        self.emptyView.hidden = NO;
+        NSLog(@"📊 无音色数据，显示空视图，设置高度: %.1f", newHeight);
+    }
+    
+    // 更新约束常量
+    self.voiceListViewHeight.constant = newHeight;
+    
+    // 动画更新布局
+    [UIView animateWithDuration:0.3 animations:^{
+        [self.contentView layoutIfNeeded];
+    }];
+    
+    NSLog(@"📊 动态调整音色选择区域完成:");
+    NSLog(@"   Cell数量: %ld", (long)cellCount);
+    NSLog(@"   voiceListViewHeight约束: %.1f", newHeight);
+}
+
+
+#pragma mark - Keyboard Handling
+
+/// ✅ 设置键盘通知监听
+- (void)setupKeyboardNotifications {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
+}
+
+/// ✅ 键盘将要显示
+- (void)keyboardWillShow:(NSNotification *)notification {
+    NSDictionary *userInfo = notification.userInfo;
+    NSValue *keyboardFrameValue = userInfo[UIKeyboardFrameEndUserInfoKey];
+    CGRect keyboardFrame = [keyboardFrameValue CGRectValue];
+    CGFloat keyboardHeight = keyboardFrame.size.height;
+    
+    NSTimeInterval animationDuration = [userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    UIViewAnimationCurve animationCurve = [userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
+    
+    // 调整滚动视图的底部内边距
+    [UIView animateWithDuration:animationDuration
+                          delay:0
+                        options:(UIViewAnimationOptions)animationCurve
+                     animations:^{
+        self.mainScrollView.contentInset = UIEdgeInsetsMake(0, 0, keyboardHeight, 0);
+        self.mainScrollView.scrollIndicatorInsets = self.mainScrollView.contentInset;
+    } completion:nil];
+    
+    NSLog(@"⌨️ 键盘显示，高度: %.1f", keyboardHeight);
+}
+
+/// ✅ 键盘将要隐藏
+- (void)keyboardWillHide:(NSNotification *)notification {
+    NSDictionary *userInfo = notification.userInfo;
+    NSTimeInterval animationDuration = [userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    UIViewAnimationCurve animationCurve = [userInfo[UIKeyboardAnimationCurveUserInfoKey] integerValue];
+    
+    // 恢复滚动视图的内边距
+    [UIView animateWithDuration:animationDuration
+                          delay:0
+                        options:(UIViewAnimationOptions)animationCurve
+                     animations:^{
+        self.mainScrollView.contentInset = UIEdgeInsetsZero;
+        self.mainScrollView.scrollIndicatorInsets = UIEdgeInsetsZero;
+    } completion:nil];
+    
+    NSLog(@"⌨️ 键盘隐藏");
+}
+
+/// ✅ 刷新音色列表（从其他页面返回时可能有新音色） - 改进版
+- (void)refreshVoiceListIfNeeded {
+    NSLog(@"🔄 检查是否需要刷新音色列表");
+    
+    __weak typeof(self) weakSelf = self;
+    [[AFStoryAPIManager sharedManager] getVoicesWithStatus:0 success:^(VoiceListResponseModel * _Nonnull response) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        if (response.list && response.list.count > 0) {
+            // 过滤出已克隆成功的音色
+            NSMutableArray *newVoiceList = [NSMutableArray array];
+            strongSelf.voiceCount = response.list.count;
+            
+            for (VoiceModel *model in response.list) {
+                if (model.cloneStatus == 2) {
+                    [newVoiceList addObject:model];
+                }
+            }
+            
+            // ✅ 更详细的变化检测
+            BOOL shouldUpdate = NO;
+            NSString *changeReason = @"";
+            
+            if (newVoiceList.count != strongSelf.voiceListArray.count) {
+                shouldUpdate = YES;
+                changeReason = [NSString stringWithFormat:@"数量变化: %ld → %ld", 
+                               (long)strongSelf.voiceListArray.count, (long)newVoiceList.count];
+            } else {
+                // 检查音色ID是否有变化
+                for (NSInteger i = 0; i < newVoiceList.count; i++) {
+                    VoiceModel *newVoice = newVoiceList[i];
+                    if (i < strongSelf.voiceListArray.count) {
+                        VoiceModel *oldVoice = strongSelf.voiceListArray[i];
+                        if (newVoice.voiceId != oldVoice.voiceId) {
+                            shouldUpdate = YES;
+                            changeReason = [NSString stringWithFormat:@"音色ID变化在位置%ld: %ld → %ld", 
+                                           (long)i, (long)oldVoice.voiceId, (long)newVoice.voiceId];
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if (shouldUpdate) {
+                NSLog(@"🆕 检测到音色列表变化: %@", changeReason);
+                
+                // ✅ 记录当前选中的音色ID (如果有)
+                NSInteger currentSelectedVoiceId = 0;
+                if (strongSelf.selectedVoiceIndex >= 0 && strongSelf.selectedVoiceIndex < strongSelf.voiceListArray.count) {
+                    VoiceModel *currentSelected = strongSelf.voiceListArray[strongSelf.selectedVoiceIndex];
+                    currentSelectedVoiceId = currentSelected.voiceId;
+                }
+                
+                // 更新数据源
+                [strongSelf.voiceListArray removeAllObjects];
+                [strongSelf.voiceListArray addObjectsFromArray:newVoiceList];
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    // 刷新UI
+                    [strongSelf.voiceTabelView reloadData];
+                    strongSelf.emptyView.hidden = (newVoiceList.count > 0);
+                    
+                    // ✅ 重新匹配音色选择
+                    if (strongSelf.isEditMode && strongSelf.currentStory.voiceId > 0) {
+                        NSLog(@"🔄 音色列表更新后，重新匹配编辑模式的音色");
+                        [strongSelf selectVoiceWithId:strongSelf.currentStory.voiceId];
+                        [strongSelf.voiceTabelView reloadData];
+                    } else if (currentSelectedVoiceId > 0) {
+                        // 尝试恢复之前选中的音色
+                        NSLog(@"🔄 尝试恢复之前选中的音色ID: %ld", (long)currentSelectedVoiceId);
+                        [strongSelf selectVoiceWithId:currentSelectedVoiceId];
+                        [strongSelf.voiceTabelView reloadData];
+                    }
+                    
+                    // 动态调整高度（音色列表有变化，需要重新计算）
+                    [strongSelf updateScrollViewContentSizeWithVoiceHeightRecalc:YES];
+                });
+            } else {
+                NSLog(@"✅ 音色列表无变化");
+            }
+        }
+        
+    } failure:^(NSError * _Nonnull error) {
+        NSLog(@"❌ 刷新音色列表失败: %@", error.localizedDescription);
+    }];
+}
+
 #pragma mark - Helper Methods
 
 - (void)configureStoryTextView {
@@ -582,12 +1005,11 @@
     self.storyTextField.textContainerInset = UIEdgeInsetsMake(12, 12, 12, 12);
     self.storyTextField.textContainer.lineFragmentPadding = 0; // 去除默认的左右边距
     
-    // 滚动和显示配置
-    self.storyTextField.scrollEnabled = YES;
-    self.storyTextField.showsVerticalScrollIndicator = YES;
+    // ✅ 修改滚动配置，避免与主滚动视图冲突
+    self.storyTextField.scrollEnabled = NO; // 禁用内部滚动，使用主滚动视图
+    self.storyTextField.showsVerticalScrollIndicator = NO;
     self.storyTextField.showsHorizontalScrollIndicator = NO;
-    self.storyTextField.bounces = YES; // 允许弹性滚动
-    self.storyTextField.alwaysBounceVertical = YES; // 即使内容不够也允许垂直弹性滚动
+    self.storyTextField.bounces = NO;
     
     // 键盘和输入配置
     self.storyTextField.returnKeyType = UIReturnKeyDefault;
@@ -604,7 +1026,7 @@
     
     // 确保文本容器充满整个视图
     self.storyTextField.textContainer.widthTracksTextView = YES;
-    self.storyTextField.textContainer.heightTracksTextView = NO; // 允许垂直滚动
+    self.storyTextField.textContainer.heightTracksTextView = YES; // 让高度自动适应内容
     self.storyTextField.textContainer.maximumNumberOfLines = 0; // 无限行数
     
     // 设置键盘外观
@@ -613,42 +1035,70 @@
     }
 }
 
+/// ✅ 更新滚动视图内容大小 - 只调整故事内容高度（用于文本内容变化时）
+- (void)updateScrollViewContentSizeForStoryOnly {
+    if (!self.contentView) {
+        return;
+    }
+    
+    // 强制布局更新
+    [self.contentView layoutIfNeeded];
+    
+    // ✅ 只调整故事内容区域的高度，不重新计算音色区域
+    [self adjustStoryViewHeight];
+    
+    // 再次强制布局更新，确保约束变化生效
+    [self.contentView layoutIfNeeded];
+    
+    // 计算所有子视图的最大底部位置
+    CGFloat maxY = 0;
+    for (UIView *subview in self.contentView.subviews) {
+        if (!subview.hidden && subview.alpha > 0) {
+            CGFloat bottom = CGRectGetMaxY(subview.frame);
+            if (bottom > maxY) {
+                maxY = bottom;
+            }
+        }
+    }
+    
+    // 添加一些底部边距，确保有足够的滚动空间
+    maxY += 100;
+    
+    // 确保内容高度至少比屏幕高度大一些，这样才能滚动
+    CGFloat screenHeight = [UIScreen mainScreen].bounds.size.height;
+    CGFloat contentHeight = MAX(maxY, screenHeight + 100);
+    
+    // 设置内容视图的frame大小
+    CGRect contentFrame = self.contentView.frame;
+    contentFrame.size.height = contentHeight;
+    self.contentView.frame = contentFrame;
+    
+    // 设置ScrollView的内容大小
+    self.mainScrollView.contentSize = CGSizeMake(self.contentView.frame.size.width, contentHeight);
+    
+    NSLog(@"📏 滚动视图内容大小已更新（仅故事内容）: %.1f x %.1f", 
+          self.mainScrollView.contentSize.width, self.mainScrollView.contentSize.height);
+}
+
+/// ✅ 添加延迟调整方法，避免频繁调用
+- (void)scheduleStoryHeightAdjustment {
+    // 取消之前的调用
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateScrollViewContentSizeForStoryOnly) object:nil];
+    
+    // 延迟调用，避免频繁更新，只调整故事内容高度
+    [self performSelector:@selector(updateScrollViewContentSizeForStoryOnly) withObject:nil afterDelay:0.1];
+}
+
 - (void)setIsEditMode:(BOOL)isEditMode {
     _isEditMode = isEditMode;
     
-    // 如果视图已经加载，立即更新UI
-    if (self.isViewLoaded) {
-        self.title = isEditMode ? @"Edit Story" : @"Create Story";
-//        [self updateTextFieldsEditability];
-    }
+//    // 如果视图已经加载，立即更新UI
+//    if (self.isViewLoaded) {
+//        self.title = isEditMode ? @"Edit Story" : @"Create Story";
+////        [self updateTextFieldsEditability];
+//    }
 }
 
-//- (void)updateTextFieldsEditability {
-//    // 设置文本框的可编辑状态
-//    self.storyTextField.editable = self.isEditMode; // 修复：使用editable而不是enabled
-//    self.stroryThemeTextView.enabled = self.isEditMode;
-//    
-//    // 根据编辑状态调整文本框的外观
-//    if (self.isEditMode) {
-//        // 编辑模式：可编辑样式
-//        self.storyTextField.backgroundColor = [UIColor whiteColor];
-//        self.stroryThemeTextView.backgroundColor = [UIColor whiteColor];
-//        self.storyTextField.alpha = 1.0;
-//        self.stroryThemeTextView.alpha = 1.0;
-//        
-//        // 编辑模式下可以选择文本
-//        self.storyTextField.selectable = YES;
-//    } else {
-//        // 只读模式：不可编辑样式
-//        self.storyTextField.backgroundColor = [UIColor whiteColor];
-//        self.stroryThemeTextView.backgroundColor = [UIColor whiteColor];
-//        self.storyTextField.alpha = 0.8;
-//        self.stroryThemeTextView.alpha = 0.8;
-//        
-//        // 只读模式下仍可以选择文本（用于复制等操作）
-//        self.storyTextField.selectable = YES;
-//    }
-//}
 - (IBAction)addHeaderImageBtnClick:(id)sender {
     [self showIllustrationPicker];
 }
@@ -1117,27 +1567,173 @@
             NSLog(@"🔄 故事内容发生变更，长度: %ld → %ld", 
                   (long)self.originalStoryContent.length, (long)currentContent.length);
         }
+        
+        // ✅ 使用延迟调整，避免频繁更新
+        [self scheduleStoryHeightAdjustment];
     }
 }
 
-/// 根据音色ID选中对应的音色
+/// 根据音色ID选中对应的音色 - 改进匹配逻辑
 - (void)selectVoiceWithId:(NSInteger)voiceId {
     NSLog(@"🔍 开始查找音色ID: %ld，当前音色列表数量: %ld", (long)voiceId, (long)self.voiceListArray.count);
     
+    if (voiceId <= 0) {
+        NSLog(@"⚠️ 无效的音色ID: %ld", (long)voiceId);
+        self.selectedVoiceIndex = -1;
+        return;
+    }
+    
+    // ✅ 重置选中索引
+    self.selectedVoiceIndex = -1;
+    
+    // ✅ 遍历查找匹配的音色
     for (NSInteger i = 0; i < self.voiceListArray.count; i++) {
         VoiceModel *voice = self.voiceListArray[i];
-        NSLog(@"   检查音色[%ld]: %@ (ID: %ld)", (long)i, voice.voiceName, (long)voice.voiceId);
         
+        // ✅ 添加更详细的日志
+        NSLog(@"   检查音色[%ld]: 名称='%@', ID=%ld, cloneStatus=%ld", 
+              (long)i, voice.voiceName ?: @"无名称", (long)voice.voiceId, (long)voice.cloneStatus);
+        
+        // ✅ 严格匹配音色ID
         if (voice.voiceId == voiceId) {
             self.selectedVoiceIndex = i;
-            NSLog(@"🎵 成功匹配！自动选中音色: %@ (ID: %ld, 索引: %ld)", voice.voiceName, (long)voiceId, (long)i);
+            NSLog(@"🎵 成功匹配！自动选中音色: '%@' (ID: %ld, 索引: %ld)", 
+                  voice.voiceName ?: @"无名称", (long)voiceId, (long)i);
+            
+            // ✅ 匹配成功后立即返回
             return;
         }
     }
     
-    // 如果没有找到匹配的音色
-    self.selectedVoiceIndex = -1;
+    // ✅ 如果没有找到匹配的音色，提供更详细的错误信息
     NSLog(@"⚠️ 未找到匹配的音色ID: %ld", (long)voiceId);
+    NSLog(@"   当前可用音色列表:");
+    for (NSInteger i = 0; i < self.voiceListArray.count; i++) {
+        VoiceModel *voice = self.voiceListArray[i];
+        NSLog(@"     [%ld] %@ (ID: %ld)", (long)i, voice.voiceName ?: @"无名称", (long)voice.voiceId);
+    }
+    
+    self.selectedVoiceIndex = -1;
+}
+
+/// ✅ 备用音色选择策略
+- (void)tryFallbackVoiceSelection {
+    NSLog(@"🔄 尝试备用音色选择策略");
+    
+    if (!self.isEditMode || !self.currentStory) {
+        return;
+    }
+    
+    NSInteger targetVoiceId = self.currentStory.voiceId;
+    NSLog(@"🎯 目标音色ID: %ld", (long)targetVoiceId);
+    
+    // ✅ 策略1: 重新获取完整音色列表（包括所有状态）
+    __weak typeof(self) weakSelf = self;
+    [[AFStoryAPIManager sharedManager] getVoicesWithStatus:0 success:^(VoiceListResponseModel * _Nonnull response) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        NSLog(@"🔍 备用策略：获得完整音色列表，数量: %ld", (long)response.list.count);
+        
+        // 查找目标音色的详细信息
+        VoiceModel *targetVoice = nil;
+        for (VoiceModel *voice in response.list) {
+            if (voice.voiceId == targetVoiceId) {
+                targetVoice = voice;
+                break;
+            }
+        }
+        
+        if (targetVoice) {
+            NSLog(@"🎵 找到目标音色: %@, cloneStatus: %ld", targetVoice.voiceName ?: @"无名称", (long)targetVoice.cloneStatus);
+            
+            if (targetVoice.cloneStatus != 2) {
+                NSLog(@"⚠️ 音色状态异常: cloneStatus = %ld (应为2)", (long)targetVoice.cloneStatus);
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSString *statusText = @"";
+                    switch (targetVoice.cloneStatus) {
+                        case 0:
+                            statusText = @"待处理";
+                            break;
+                        case 1:
+                            statusText = @"处理中";
+                            break;
+                        case 3:
+                            statusText = @"处理失败";
+                            break;
+                        default:
+                            statusText = [NSString stringWithFormat:@"未知状态(%ld)", (long)targetVoice.cloneStatus];
+                            break;
+                    }
+                    
+                    NSString *alertMessage = [NSString stringWithFormat:@"故事使用的音色 '%@' 当前状态为：%@\n无法在列表中显示", 
+                                            targetVoice.voiceName ?: @"未知音色", statusText];
+                    [strongSelf showErrorAlert:alertMessage];
+                });
+            } else {
+                // 音色状态正常但不在过滤列表中，可能是数据同步问题
+                NSLog(@"🔄 音色状态正常，重新加载音色列表");
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [strongSelf reloadVoiceListAndRetrySelection];
+                });
+            }
+        } else {
+            NSLog(@"❌ 完整列表中也找不到音色ID: %ld", (long)targetVoiceId);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSString *alertMessage = [NSString stringWithFormat:@"故事使用的音色(ID:%ld)已不存在\n请重新选择音色", (long)targetVoiceId];
+                [strongSelf showErrorAlert:alertMessage];
+            });
+        }
+        
+    } failure:^(NSError * _Nonnull error) {
+        NSLog(@"❌ 备用策略失败: %@", error.localizedDescription);
+    }];
+}
+
+/// ✅ 重新加载音色列表并重试选择
+- (void)reloadVoiceListAndRetrySelection {
+    NSLog(@"🔄 重新加载音色列表并重试选择");
+    
+    __weak typeof(self) weakSelf = self;
+    [[AFStoryAPIManager sharedManager] getVoicesWithStatus:0 success:^(VoiceListResponseModel * _Nonnull response) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        // 重新过滤音色列表
+        [strongSelf.voiceListArray removeAllObjects];
+        strongSelf.voiceCount = response.list.count;
+        
+        for (VoiceModel *model in response.list) {
+            if (model.cloneStatus == 2) {
+                [strongSelf.voiceListArray addObject:model];
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // 刷新UI
+            [strongSelf.voiceTabelView reloadData];
+            strongSelf.emptyView.hidden = (strongSelf.voiceListArray.count > 0);
+            
+            // 再次尝试匹配
+            if (strongSelf.currentStory.voiceId > 0) {
+                [strongSelf selectVoiceWithId:strongSelf.currentStory.voiceId];
+                
+                if (strongSelf.selectedVoiceIndex >= 0) {
+                    NSLog(@"✅ 重新加载后匹配成功");
+                    [strongSelf.voiceTabelView reloadData];
+                } else {
+                    NSLog(@"❌ 重新加载后仍匹配失败");
+                }
+            }
+            
+            // 更新滚动视图（音色列表有变化，需要重新计算）
+            [strongSelf updateScrollViewContentSizeWithVoiceHeightRecalc:YES];
+        });
+        
+    } failure:^(NSError * _Nonnull error) {
+        NSLog(@"❌ 重新加载音色列表失败: %@", error.localizedDescription);
+    }];
 }
 
 /// 获取当前选中的音色ID
@@ -1270,29 +1866,48 @@
 
 #pragma mark - ✅ 调试和验证方法
 
-/// 调试当前选中状态
+/// 调试当前选中状态 - 增强版
 - (void)debugCurrentSelectionState {
-    NSLog(@"🔍 当前选中状态调试:");
+    NSLog(@"🔍 ========== 当前选中状态详细调试 ==========");
     NSLog(@"   编辑模式: %@", self.isEditMode ? @"是" : @"否");
     NSLog(@"   选中索引: %ld", (long)self.selectedVoiceIndex);
     NSLog(@"   音色数组数量: %ld", (long)self.voiceListArray.count);
     NSLog(@"   原始音色ID: %ld", (long)self.originalVoiceId);
+    NSLog(@"   故事音色ID: %ld", (long)(self.currentStory ? self.currentStory.voiceId : -1));
     NSLog(@"   当前音色ID: %ld", (long)[self getCurrentVoiceId]);
     
     if (self.selectedVoiceIndex >= 0 && self.selectedVoiceIndex < self.voiceListArray.count) {
         VoiceModel *selectedVoice = self.voiceListArray[self.selectedVoiceIndex];
-        NSLog(@"   选中音色: %@ (ID: %ld)", selectedVoice.voiceName, (long)selectedVoice.voiceId);
+        NSLog(@"   选中音色: '%@' (ID: %ld, cloneStatus: %ld)", 
+              selectedVoice.voiceName ?: @"无名称", 
+              (long)selectedVoice.voiceId,
+              (long)selectedVoice.cloneStatus);
     } else if (self.isEditMode && self.originalVoiceId > 0) {
         NSLog(@"   编辑模式：使用原始音色ID: %ld", (long)self.originalVoiceId);
     } else {
         NSLog(@"   未选中任何音色");
     }
+    
+    // ✅ 显示完整的音色列表信息
+    NSLog(@"   --- 当前音色列表详情 ---");
+    for (NSInteger i = 0; i < self.voiceListArray.count; i++) {
+        VoiceModel *voice = self.voiceListArray[i];
+        NSString *isSelectedMark = (i == self.selectedVoiceIndex) ? @" ✅" : @"";
+        NSLog(@"     [%ld] '%@' (ID: %ld, cloneStatus: %ld)%@", 
+              (long)i, 
+              voice.voiceName ?: @"无名称", 
+              (long)voice.voiceId,
+              (long)voice.cloneStatus,
+              isSelectedMark);
+    }
+    
+    NSLog(@"========================================");
 }
 
 - (void)dealloc {
     NSLog(@"🔄 CreateStoryWithVoiceViewController dealloc");
     
-    // ✅ 移除通知监听
+    // ✅ 移除通知监听（包括键盘通知）
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     // ✅ 停止音频播放并清理资源
@@ -1301,6 +1916,8 @@
     // ✅ 清理其他资源
     self.voiceListArray = nil;
     self.currentStory = nil;
+    self.mainScrollView = nil;
+    self.contentView = nil;
     
     NSLog(@"✅ CreateStoryWithVoiceViewController 资源清理完成");
 }
