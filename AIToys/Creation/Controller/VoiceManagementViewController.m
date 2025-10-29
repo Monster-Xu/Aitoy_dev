@@ -31,6 +31,10 @@
 @property (nonatomic, strong) UIBarButtonItem *editDoneButton; // 完成按钮
 @property (nonatomic, strong) UILongPressGestureRecognizer *longPressGesture; // 长按手势
 
+// ✅ 左滑删除状态
+@property (nonatomic, assign) BOOL isSwipeDeleting; // 是否正在左滑删除
+@property (nonatomic, assign) BOOL isRefresh; // 是否是下拉刷新
+
 @end
 
 @implementation VoiceManagementViewController
@@ -196,6 +200,7 @@
     self.voiceListTabelView.delegate = self;
     self.voiceListTabelView.dataSource = self;
     self.voiceListTabelView.mj_header = [RYFGifHeader headerWithRefreshingBlock:^{
+        self.isRefresh = YES;
         [self loadVoiceListWithSkeleton];
     }];
     
@@ -237,6 +242,9 @@
     self.isEditingMode = NO;
     self.selectedIndexes = [NSMutableSet set];
     
+    // ✅ 初始化左滑删除状态
+    self.isSwipeDeleting = NO;
+    
     // ✅ 初始化创建按钮状态
     [self updateCreateButtonState];
 }
@@ -273,8 +281,8 @@
 
 /// 更新手势状态
 - (void)updateGestureState {
-    // ✅ 检查tableView是否在编辑状态，如果是则暂时禁用返回手势
-    if (self.voiceListTabelView.isEditing) {
+    // ✅ 检查是否在自定义编辑模式，如果是则暂时禁用返回手势
+    if (self.isEditingMode) {
         self.fd_interactivePopDisabled = YES;
     } else {
         self.fd_interactivePopDisabled = NO;
@@ -320,7 +328,12 @@
 /// 加载声音列表，显示骨架屏加载效果
 - (void)loadVoiceListWithSkeleton {
     // 设置加载状态
-    self.isLoading = YES;
+    if (self.isRefresh) {
+        self.isLoading = NO;
+    }else{
+        self.isLoading = YES;
+    }
+    
     self.emptyView.hidden = YES;
     
     // 刷新TableView，显示骨架屏
@@ -347,6 +360,13 @@
         [self.voiceListTabelView.mj_header endRefreshing];
         // 刷新TableView，显示真实数据
         [self.voiceListTabelView reloadData];
+        
+        // ✅ 如果处于编辑模式，需要重新更新所有cell的编辑模式状态
+        if (self.isEditingMode) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self updateAllVisibleCellsEditingMode];
+            });
+        }
         
         // ✅ 更新创建按钮状态
         [self updateCreateButtonState];
@@ -415,6 +435,10 @@
     if (indexPath.section < self.voiceList.count) {
         VoiceModel *voice = self.voiceList[indexPath.section];
         [cell configureWithVoiceModel:voice];
+        
+        // ✅ 更新cell的编辑模式状态
+        BOOL isSelected = [self.selectedIndexes containsObject:@(indexPath.section)];
+        [cell updateEditingMode:self.isEditingMode isSelected:isSelected];
     }
     
     return cell;
@@ -445,7 +469,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    return 5;
+    return 9;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
@@ -471,10 +495,37 @@
     
     // ✅ 编辑模式下的选择逻辑
     if (self.isEditingMode) {
-        [self.selectedIndexes addObject:@(indexPath.section)];
-        [self updateNavigationTitle];
-        [self updateDeleteButtonState];
-        NSLog(@"✅ 选中项目 - section: %ld, 总选中: %ld", (long)indexPath.section, (long)self.selectedIndexes.count);
+        // ✅ 检查当前项目是否已经被选中
+        if ([self.selectedIndexes containsObject:@(indexPath.section)]) {
+            // 如果已选中，则取消选中
+            [self.selectedIndexes removeObject:@(indexPath.section)];
+            [self updateNavigationTitle];
+            [self updateDeleteButtonState];
+            
+            // ✅ 更新cell的选中状态
+            VoiceManagementTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+            if ([cell isKindOfClass:[VoiceManagementTableViewCell class]]) {
+                [cell updateEditingMode:YES isSelected:NO];
+            }
+            
+            NSLog(@"❌ 取消选中项目 - section: %ld, 总选中: %ld", (long)indexPath.section, (long)self.selectedIndexes.count);
+        } else {
+            // 如果未选中，则选中
+            [self.selectedIndexes addObject:@(indexPath.section)];
+            [self updateNavigationTitle];
+            [self updateDeleteButtonState];
+            
+            // ✅ 更新cell的选中状态
+            VoiceManagementTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+            if ([cell isKindOfClass:[VoiceManagementTableViewCell class]]) {
+                [cell updateEditingMode:YES isSelected:YES];
+            }
+            
+            NSLog(@"✅ 选中项目 - section: %ld, 总选中: %ld", (long)indexPath.section, (long)self.selectedIndexes.count);
+        }
+        
+        // ✅ 在自定义编辑模式下，总是取消系统的选中状态
+        [tableView deselectRowAtIndexPath:indexPath animated:NO];
         return;
     }
     
@@ -488,16 +539,6 @@
         if (voice.cloneStatus != 1) {
             [self handleEditVoice:voice];
         }
-    }
-}
-
-/// ✅ 新增：处理编辑模式下的取消选中
-- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.isEditingMode) {
-        [self.selectedIndexes removeObject:@(indexPath.section)];
-        [self updateNavigationTitle];
-        [self updateDeleteButtonState];
-        NSLog(@"❌ 取消选中项目 - section: %ld, 总选中: %ld", (long)indexPath.section, (long)self.selectedIndexes.count);
     }
 }
 
@@ -516,6 +557,12 @@
     if (self.isLoading) {
         return NO;
     }
+    
+    // ✅ 自定义编辑模式下不允许左滑删除
+    if (self.isEditingMode) {
+        return NO;
+    }
+    
     return YES;
 }
 
@@ -530,6 +577,11 @@
     
     // ✅ 加载中不显示删除操作
     if (self.isLoading) {
+        return nil;
+    }
+    
+    // ✅ 自定义编辑模式下不显示左滑删除操作
+    if (self.isEditingMode) {
         return nil;
     }
     
@@ -552,14 +604,26 @@
 
 /// 开始编辑时禁用返回手势
 - (void)tableView:(UITableView *)tableView willBeginEditingRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"🔄 开始左滑删除编辑 - section: %ld", (long)indexPath.section);
+    
+    // ✅ 标记为正在左滑删除，禁用长按手势
+    self.isSwipeDeleting = YES;
+    
     // ✅ 开始编辑时禁用返回手势
     self.fd_interactivePopDisabled = YES;
 }
 
 /// 结束编辑时恢复返回手势
 - (void)tableView:(UITableView *)tableView didEndEditingRowAtIndexPath:(nullable NSIndexPath *)indexPath {
-    // ✅ 结束编辑时恢复返回手势
-    self.fd_interactivePopDisabled = NO;
+    NSLog(@"✅ 结束左滑删除编辑 - section: %ld", indexPath ? (long)indexPath.section : -1);
+    
+    // ✅ 恢复左滑删除状态，允许长按手势
+    self.isSwipeDeleting = NO;
+    
+    // ✅ 结束编辑时恢复返回手势（但要检查是否在自定义编辑模式）
+    if (!self.isEditingMode) {
+        self.fd_interactivePopDisabled = NO;
+    }
 }
 
 #pragma mark - 音频播放处理
@@ -862,6 +926,9 @@
     // 停止当前播放的音频
     [self stopCurrentAudio];
     
+    // ✅ 重置左滑删除状态
+    self.isSwipeDeleting = NO;
+    
     // ✅ 停止所有骨架屏动画
     for (SkeletonTableViewCell *cell in self.voiceListTabelView.visibleCells) {
         if ([cell isKindOfClass:[SkeletonTableViewCell class]]) {
@@ -871,6 +938,7 @@
     
     // ✅ 确保返回手势可用（用于下一个页面）
     self.fd_interactivePopDisabled = NO;
+    self.isRefresh = NO;
 }
 
 /// 恢复默认的导航栏外观
@@ -1035,8 +1103,12 @@
 /// 处理长按手势
 - (void)handleLongPressGesture:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        // ✅ 加载中或已经在编辑模式时不响应长按
-        if (self.isLoading || self.isEditingMode) {
+        // ✅ 加载中、已经在编辑模式或正在左滑删除时不响应长按
+        if (self.isLoading || self.isEditingMode || self.isSwipeDeleting) {
+            NSLog(@"⚠️ 长按被禁用 - 加载中: %@, 编辑模式: %@, 左滑删除: %@", 
+                  self.isLoading ? @"是" : @"否",
+                  self.isEditingMode ? @"是" : @"否", 
+                  self.isSwipeDeleting ? @"是" : @"否");
             return;
         }
         
@@ -1075,8 +1147,11 @@
     self.isEditingMode = YES;
     [self.selectedIndexes removeAllObjects];
     
-    // ✅ 设置TableView为编辑模式
-    [self.voiceListTabelView setEditing:YES animated:YES];
+    // ✅ 不使用系统的编辑模式，使用自定义编辑模式
+    // [self.voiceListTabelView setEditing:YES animated:YES]; // 注释掉系统编辑模式
+    
+    // ✅ 更新所有可见cell的编辑模式状态
+    [self updateAllVisibleCellsEditingMode];
     
     // ✅ 更新导航栏 - 添加完成按钮
     [self setupEditingNavigationBar];
@@ -1102,8 +1177,11 @@
     self.isEditingMode = NO;
     [self.selectedIndexes removeAllObjects];
     
-    // ✅ 设置TableView退出编辑模式
-    [self.voiceListTabelView setEditing:NO animated:YES];
+    // ✅ 不使用系统的编辑模式，使用自定义编辑模式
+    // [self.voiceListTabelView setEditing:NO animated:YES]; // 注释掉系统编辑模式
+    
+    // ✅ 更新所有可见cell的编辑模式状态
+    [self updateAllVisibleCellsEditingMode];
     
     // ✅ 恢复导航栏
     [self restoreNormalNavigationBar];
@@ -1163,10 +1241,17 @@
 /// 选中指定section的cell
 - (void)selectCellAtSection:(NSInteger)section {
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:section];
-    [self.voiceListTabelView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionNone];
+    // ✅ 在自定义编辑模式下，不使用系统的选中方法
+    // [self.voiceListTabelView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionNone];
     [self.selectedIndexes addObject:@(section)];
     [self updateNavigationTitle];
     [self updateDeleteButtonState];
+    
+    // ✅ 更新cell的选中状态
+    VoiceManagementTableViewCell *cell = [self.voiceListTabelView cellForRowAtIndexPath:indexPath];
+    if ([cell isKindOfClass:[VoiceManagementTableViewCell class]]) {
+        [cell updateEditingMode:YES isSelected:YES];
+    }
 }
 
 /// 取消选中指定section的cell
@@ -1176,6 +1261,23 @@
     [self.selectedIndexes removeObject:@(section)];
     [self updateNavigationTitle];
     [self updateDeleteButtonState];
+    
+    // ✅ 更新cell的选中状态
+    VoiceManagementTableViewCell *cell = [self.voiceListTabelView cellForRowAtIndexPath:indexPath];
+    if ([cell isKindOfClass:[VoiceManagementTableViewCell class]]) {
+        [cell updateEditingMode:YES isSelected:NO];
+    }
+}
+
+/// ✅ 更新所有可见cell的编辑模式状态
+- (void)updateAllVisibleCellsEditingMode {
+    for (NSIndexPath *indexPath in self.voiceListTabelView.indexPathsForVisibleRows) {
+        VoiceManagementTableViewCell *cell = [self.voiceListTabelView cellForRowAtIndexPath:indexPath];
+        if ([cell isKindOfClass:[VoiceManagementTableViewCell class]]) {
+            BOOL isSelected = [self.selectedIndexes containsObject:@(indexPath.section)];
+            [cell updateEditingMode:self.isEditingMode isSelected:isSelected];
+        }
+    }
 }
 
 #pragma mark - ✅ 底部按钮管理

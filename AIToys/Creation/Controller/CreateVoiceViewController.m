@@ -1916,8 +1916,8 @@
     self.recordedTime++;
     self.remainingTime--;
     
-    // 更新进度条（假设最大录音时长为60秒）
-    CGFloat progress = MIN(1.0, self.recordedTime / 60.0);
+    // ✅ 更新进度条（30秒为满进度）
+    CGFloat progress = MIN(1.0, self.recordedTime / 30.0);
     [self updateRecordingProgress:progress];
     
     // ✅ 更新录音时间显示 - 松手就能停止录音
@@ -2109,18 +2109,43 @@
     // 隐藏进度条
     [self hideRecordingProgress];
     self.voiceGifImageView.hidden = NO;
-    // 加载本地 GIF
-    NSString *gifPath = [[NSBundle mainBundle] pathForResource:@"声音处理" ofType:@"gif"];
-    NSURL *gifURL = [NSURL fileURLWithPath:gifPath];
-
-    [self.voiceGifImageView sd_setImageWithURL:gifURL completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-        if (image) {
-            
-            self.speekBtn.hidden = YES;
-            
-        }
-    }];
     
+    // 加载帧动画图片序列（声音处理0000到声音处理0039）
+    NSMutableArray *frameImages = [NSMutableArray array];
+    
+    // 循环加载40帧图片（0000到0039）
+    for (int i = 0; i <= 39; i++) {
+        NSString *imageName = [NSString stringWithFormat:@"声音处理%04d", i];
+        UIImage *frameImage = [UIImage imageNamed:imageName];
+        
+        if (frameImage) {
+            [frameImages addObject:frameImage];
+        } else {
+            NSLog(@"⚠️ 找不到帧图片: %@", imageName);
+        }
+    }
+    
+    if (frameImages.count > 0) {
+        NSLog(@"✅ 成功加载 %lu 帧动画图片", (unsigned long)frameImages.count);
+        
+        // 设置帧动画
+        self.voiceGifImageView.animationImages = frameImages;
+        self.voiceGifImageView.animationDuration = 2.0; // 动画总时长2秒
+        self.voiceGifImageView.animationRepeatCount = 0; // 无限循环
+        
+        // 开始动画
+        [self.voiceGifImageView startAnimating];
+        
+        // 隐藏录音按钮
+        self.speekBtn.hidden = YES;
+        
+        NSLog(@"🎬 声音处理帧动画已开始");
+    } else {
+        NSLog(@"❌ 没有找到任何帧图片，回退使用录音按钮");
+        // 如果没有找到帧图片，保持原有状态
+        self.voiceGifImageView.hidden = YES;
+        self.speekBtn.hidden = NO;
+    }
     
     // 可选：添加按钮点击提示，告诉用户正在处理
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(processingButtonTapped:)];
@@ -2148,13 +2173,21 @@
     }
     
     NSLog(@"🔄 开始重置录音按钮状态");
+    
+    // 1. 停止并隐藏帧动画
+    if (self.voiceGifImageView.isAnimating) {
+        [self.voiceGifImageView stopAnimating];
+        NSLog(@"⏹️ 已停止声音处理帧动画");
+    }
     self.voiceGifImageView.hidden = YES;
-    // 1. 移除处理动画
+    self.voiceGifImageView.animationImages = nil; // 清理动画图片数组，释放内存
+    
+    // 2. 移除处理动画
     if (self.speekBtn.imageView.layer) {
         [self.speekBtn.imageView.layer removeAnimationForKey:@"rotationAnimation"];
     }
     
-    // 2. 移除点击手势（处理状态的点击手势）
+    // 3. 移除点击手势（处理状态的点击手势）
     NSArray *gestures = [self.speekBtn.gestureRecognizers copy];
     for (UIGestureRecognizer *gesture in gestures) {
         if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
@@ -2162,14 +2195,14 @@
         }
     }
     
-    // 3. 重新启用长按手势（录音手势）
+    // 4. 重新启用长按手势（录音手势）
     for (UIGestureRecognizer *gesture in self.speekBtn.gestureRecognizers) {
         if ([gesture isKindOfClass:[UILongPressGestureRecognizer class]]) {
             gesture.enabled = YES;
         }
     }
     
-    // 4. 恢复原始的录音按钮外观
+    // 5. 恢复原始的录音按钮外观
     UIImage *defaultRecordImage = [UIImage imageNamed:@"create_voiceclone"];
     if (defaultRecordImage) {
         [self.speekBtn setImage:defaultRecordImage forState:UIControlStateNormal];
@@ -2183,14 +2216,14 @@
     [self.speekBtn setTitle:nil forState:UIControlStateNormal];
     [self.speekBtn setBackgroundImage:nil forState:UIControlStateNormal];
     
-    // 5. 重新启用用户交互
+    // 6. 重新启用用户交互
     self.speekBtn.userInteractionEnabled = YES;
     
-    // 6. 确保按钮可见
+    // 7. 确保按钮可见
     self.speekBtn.hidden = NO;
     self.speekBtn.alpha = 1.0;
     
-    // 7. 确保进度条被隐藏和重置
+    // 8. 确保进度条被隐藏和重置
     [self hideRecordingProgress];
     
     NSLog(@"✅ 录音按钮状态已重置为初始状态");
@@ -2232,14 +2265,17 @@
     self.progressLayer.strokeEnd = progress;
     [CATransaction commit];
     
-    // 根据进度改变颜色
+    // ✅ 根据进度使用渐变颜色：#FDAB1E → #F443AF → #6D36F5，透明度90%
     UIColor *strokeColor;
-    if (progress < 0.5) {
-        // 前30秒，橙色到紫色渐变
-        strokeColor = [UIColor systemOrangeColor];
+    if (progress <= 0.3) {
+        // 前30%：使用第一个颜色 #FDAB1E（橙黄色），透明度90%
+        strokeColor = [UIColor colorWithRed:0xFD/255.0 green:0xAB/255.0 blue:0x1E/255.0 alpha:0.9];
+    } else if (progress <= 0.6) {
+        // 中间30%：使用第二个颜色 #F443AF（粉红色），透明度90%
+        strokeColor = [UIColor colorWithRed:0xF4/255.0 green:0x43/255.0 blue:0xAF/255.0 alpha:0.9];
     } else {
-        // 30秒后，紫色
-        strokeColor = [UIColor systemPurpleColor];
+        // 最后40%：使用第三个颜色 #6D36F5（紫蓝色），透明度90%
+        strokeColor = [UIColor colorWithRed:0x6D/255.0 green:0x36/255.0 blue:0xF5/255.0 alpha:0.9];
     }
     
     self.progressLayer.strokeColor = strokeColor.CGColor;
@@ -2284,6 +2320,16 @@
     if (self.recordTimer) {
         [self.recordTimer invalidate];
         self.recordTimer = nil;
+    }
+    
+    // 清理帧动画
+    @try {
+        if (self.voiceGifImageView.isAnimating) {
+            [self.voiceGifImageView stopAnimating];
+        }
+        self.voiceGifImageView.animationImages = nil; // 释放帧图片内存
+    } @catch (NSException *exception) {
+        NSLog(@"⚠️ 清理帧动画异常: %@", exception.reason);
     }
     
     // 清理进度条

@@ -68,7 +68,7 @@
     
     // ⭐️ 状态视图 - 显示在封面图下方
     self.statusView = [[UIView alloc] init];
-    self.statusView.layer.cornerRadius = 4;
+    self.statusView.layer.cornerRadius = 8;
     self.statusView.hidden = YES;
     [cardContainerView addSubview:self.statusView];
     
@@ -122,6 +122,19 @@
     [self.playButton addTarget:self action:@selector(playButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [cardContainerView addSubview:self.playButton];
     
+    // ✅ 音频加载指示器
+    self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+    self.loadingIndicator.color = [UIColor systemBlueColor];
+    self.loadingIndicator.hidesWhenStopped = YES;
+    self.loadingIndicator.hidden = YES;
+    [cardContainerView addSubview:self.loadingIndicator];
+    
+    // 初始化加载状态
+    self.isAudioLoading = NO;
+    
+    // ✅ 自定义选择按钮
+    [self setupChooseButton:cardContainerView];
+    
     [self setupConstraintsWithContainer:cardContainerView];
 }
 
@@ -149,6 +162,12 @@
         make.width.height.mas_equalTo(24);
     }];
     
+    // ✅ 加载指示器 - 与播放按钮相同位置
+    [self.loadingIndicator mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.center.equalTo(self.playButton);
+        make.width.height.mas_equalTo(20);
+    }];
+    
     // 编辑按钮 - 播放按钮左侧居中
     [self.editButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.equalTo(self.playButton.mas_left).offset(-12);
@@ -166,7 +185,7 @@
     // 副标题 - 标题下方
     [self.subtitleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.titleLabel);
-        make.top.equalTo(self.titleLabel.mas_bottom).offset(4);
+        make.bottom.equalTo(self.coverImageView.mas_bottom).offset(0);
         make.height.mas_equalTo(15);
         make.width.mas_equalTo(55);
     }];
@@ -175,8 +194,8 @@
     [self.statusView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(cardContainer).offset(12);
         make.right.equalTo(cardContainer).offset(-12);
-        make.bottom.equalTo(cardContainer).offset(-6);
-        make.height.mas_equalTo(20);
+        make.bottom.equalTo(cardContainer).offset(-12);
+        make.height.mas_equalTo(28);
     }];
 }
 
@@ -219,14 +238,7 @@
             // 🔍 调试信息（修复后）
             NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
             [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-            NSLog(@"📅 故事创建时间修复后:");
-            NSLog(@"   故事名称: %@", model.storyName ?: @"未知");
-            NSLog(@"   原始createTime: %@", model.createTime);
-            NSLog(@"   修正后的时间戳: %.0f", createTimeInterval);
-            NSLog(@"   创建日期: %@", [formatter stringFromDate:createDate]);
-            NSLog(@"   是否今天创建: %@", isCreatedToday ? @"是" : @"否");
-            NSLog(@"   --------------");
-            
+
             self.badgeImageView.hidden = !isCreatedToday;
         } else {
             self.badgeImageView.hidden = YES;
@@ -276,7 +288,7 @@
         self.subtitleLabel.text = [NSString stringWithFormat:@"Voice - %@", self.model.voiceName];
         self.subtitleLabel.textColor = [UIColor systemBlueColor];
     } else {
-        self.subtitleLabel.text = @"No-Voice";
+        self.subtitleLabel.text = @"No Voice";
         self.subtitleLabel.textColor = [UIColor systemGrayColor];
     }
     
@@ -308,7 +320,7 @@
         self.subtitleLabel.textColor = [UIColor systemBlueColor];
         self.subtitleLabel.hidden = NO;
     } else {
-        self.subtitleLabel.text = @"No-Voice";
+        self.subtitleLabel.text = @"No Voice";
         self.subtitleLabel.textColor = [UIColor systemGrayColor];
         self.subtitleLabel.hidden = NO;
     }
@@ -337,7 +349,7 @@
         self.subtitleLabel.text = [NSString stringWithFormat:@"Voice - %@", self.model.voiceName];
         self.subtitleLabel.textColor = [UIColor systemBlueColor];
     } else {
-        self.subtitleLabel.text = @"No-Voice";
+        self.subtitleLabel.text = @"No Voice";
         self.subtitleLabel.textColor = [UIColor systemGrayColor];
     }
     
@@ -371,7 +383,7 @@
         self.subtitleLabel.text = [NSString stringWithFormat:@"Voice - %@", self.model.voiceName];
         self.subtitleLabel.textColor = [UIColor systemBlueColor];
     } else {
-        self.subtitleLabel.text = @"No-Voice";
+        self.subtitleLabel.text = @"No Voice";
         self.subtitleLabel.textColor = [UIColor systemGrayColor];
     }
     
@@ -400,7 +412,7 @@
         self.subtitleLabel.text = [NSString stringWithFormat:@"Voice - %@", self.model.voiceName];
         self.subtitleLabel.textColor = [UIColor systemBlueColor];
     } else {
-        self.subtitleLabel.text = @"No-Voice";
+        self.subtitleLabel.text = @"No Voice";
         self.subtitleLabel.textColor = [UIColor systemGrayColor];
     }
     
@@ -434,7 +446,7 @@
         self.subtitleLabel.text = [NSString stringWithFormat:@"Voice - %@", self.model.voiceName];
         self.subtitleLabel.textColor = [UIColor systemBlueColor];
     } else {
-        self.subtitleLabel.text = @"No-Voice";
+        self.subtitleLabel.text = @"No Voice";
         self.subtitleLabel.textColor = [UIColor systemGrayColor];
     }
     
@@ -467,7 +479,7 @@
     // ⭐️ 隐藏状态视图，显示副标题
     self.statusView.hidden = YES;
     self.subtitleLabel.hidden = NO;
-    self.subtitleLabel.text = @"No-Voice";
+    self.subtitleLabel.text = @"No Voice";
     self.subtitleLabel.textColor = [UIColor systemGrayColor];
         
     // 禁用播放按钮
@@ -499,6 +511,55 @@
     }
 }
 
+#pragma mark - ✅ Custom Selection Setup
+
+/// 设置自定义选择按钮（参考音色管理实现）
+- (void)setupChooseButton:(UIView *)cardContainerView {
+    // 创建选择按钮
+    self.chooseButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.chooseButton.hidden = YES; // 默认隐藏
+    
+    // 设置默认未选中状态的图片
+    [self.chooseButton setImage:[UIImage imageNamed:@"choose_normal"] forState:UIControlStateNormal];
+    
+    // 添加点击事件（虽然在批量编辑模式下主要通过cell点击处理，但保持一致性）
+    [self.chooseButton addTarget:self action:@selector(chooseButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [cardContainerView addSubview:self.chooseButton];
+    
+    // 设置约束 - 与编辑和播放按钮相同位置
+    [self.chooseButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.equalTo(cardContainerView).offset(-16);
+        make.centerY.equalTo(cardContainerView);
+        make.width.height.mas_equalTo(24);
+    }];
+    
+    // 初始化选中状态
+    self.isCustomSelected = NO;
+}
+
+/// 选择按钮点击事件
+- (void)chooseButtonTapped:(UIButton *)sender {
+    NSLog(@"✅ 选择按钮被点击");
+    sender.selected = !sender.selected;
+    [self updateSelectionState:sender.selected];
+}
+
+/// 更新自定义选择状态（参考音色管理实现）
+- (void)updateSelectionState:(BOOL)selected {
+    self.isCustomSelected = selected;
+    
+    if (selected) {
+        // 选中状态：显示choose_sel图片
+        [self.chooseButton setImage:[UIImage imageNamed:@"choose_sel"] forState:UIControlStateNormal];
+        NSLog(@"✅ Cell 选择状态更新: 选中");
+    } else {
+        // 未选中状态：显示choose_normal图片
+        [self.chooseButton setImage:[UIImage imageNamed:@"choose_normal"] forState:UIControlStateNormal];
+        NSLog(@"❌ Cell 选择状态更新: 未选中");
+    }
+}
+
 #pragma mark - Editing Mode
 
 // ⭐️ 核心方法：使用明确的标记判断编辑模式
@@ -510,22 +571,58 @@
           self.isBatchEditingMode ? @"YES" : @"NO");
     
     // 清晰的判断逻辑：
-    // 1. 批量编辑模式（isBatchEditingMode = YES）：隐藏按钮，显示选择框
-    // 2. 左滑删除（editing = YES, isBatchEditingMode = NO）：显示按钮
-    // 3. 正常模式（editing = NO）：显示按钮
+    // 1. 批量编辑模式（isBatchEditingMode = YES）：隐藏按钮，显示选择按钮
+    // 2. 左滑删除（editing = YES, isBatchEditingMode = NO）：显示按钮，隐藏选择按钮
+    // 3. 正常模式（editing = NO）：显示按钮，隐藏选择按钮
     
     if (self.isBatchEditingMode && editing) {
-        // 批量编辑模式：隐藏操作按钮
-        NSLog(@"📱 批量编辑模式 - 隐藏按钮");
+        // 批量编辑模式：隐藏操作按钮，显示选择按钮
+        NSLog(@"📱 批量编辑模式 - 隐藏按钮，显示选择按钮");
         self.playButton.hidden = YES;
         self.editButton.hidden = YES;
+        [self.loadingIndicator stopAnimating];  // ✅ 停止加载动画
+        self.loadingIndicator.hidden = YES;     // ✅ 隐藏加载指示器
+        self.chooseButton.hidden = NO; // ✅ 显示选择按钮
         
     } else {
+        // 正常模式或左滑删除：显示按钮，隐藏选择按钮
+        NSLog(@"📱 正常模式 - 显示按钮，隐藏选择按钮");
         self.editButton.hidden = NO;
-        self.playButton.hidden = NO;
+        self.chooseButton.hidden = YES; // ✅ 隐藏选择按钮
+        
+        // ✅ 根据加载状态决定显示播放按钮还是加载指示器
+        if (self.isAudioLoading) {
+            self.playButton.hidden = YES;
+            self.loadingIndicator.hidden = NO;
+            [self.loadingIndicator startAnimating];
+        } else {
+            self.playButton.hidden = NO;
+            self.loadingIndicator.hidden = YES;
         }
     }
+}
 
+
+/// ✅ 显示/隐藏音频加载状态
+- (void)showAudioLoading:(BOOL)loading {
+    self.isAudioLoading = loading;
+    
+    if (loading) {
+        // 显示加载状态
+        self.playButton.hidden = YES;
+        self.loadingIndicator.hidden = NO;
+        [self.loadingIndicator startAnimating];
+        
+        NSLog(@"🔄 显示音频加载状态");
+    } else {
+        // 隐藏加载状态
+        [self.loadingIndicator stopAnimating];
+        self.loadingIndicator.hidden = YES;
+        self.playButton.hidden = NO;
+        
+        NSLog(@"✅ 隐藏音频加载状态");
+    }
+}
 
 // 重置方法
 - (void)prepareForReuse {
@@ -533,6 +630,14 @@
     
     // 重置批量编辑标记
     self.isBatchEditingMode = NO;
+    
+    // ✅ 重置自定义选择状态
+    self.isCustomSelected = NO;
+    self.chooseButton.hidden = YES;
+    [self updateSelectionState:NO];
+    
+    // ✅ 重置音频加载状态
+    [self showAudioLoading:NO];
     
     // 重置按钮状态
     self.playButton.hidden = NO;

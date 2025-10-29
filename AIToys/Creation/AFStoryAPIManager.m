@@ -269,6 +269,41 @@
     }];
 }
 
+- (void)updateFailedStory:(UpdateFailedStoryRequestModel *)request
+                  success:(void(^)(APIResponseModel *response))success
+                  failure:(StoryAPIFailureBlock)failure {
+    
+    // 验证请求参数
+    if (![request isValid]) {
+        if (failure) {
+            NSError *error = [NSError errorWithDomain:@"ValidationError"
+                                                 code:400
+                                             userInfo:@{NSLocalizedDescriptionKey: [request validationError]}];
+            failure(error);
+        }
+        return;
+    }
+    
+    NSDictionary *parameters = [request toDictionary];
+    NSLog(@"🔄 调用更新失败故事接口，参数：%@", parameters);
+    
+    [[APIManager shared] POSTJSON:[APIPortConfiguration getUpdateFailedStoryUrl]
+                        parameter:parameters
+                          success:^(id result, id data, NSString *msg) {
+        APIResponseModel *response = [self parseResponseObject:result];
+        NSLog(@"✅ 更新失败故事接口响应：%@", response);
+        if (success) success(response);
+    } failure:^(NSError *error, NSString *msg) {
+        NSLog(@"❌ 更新失败故事接口请求失败：%@", error.localizedDescription);
+        if (failure) {
+            NSError *apiError = [NSError errorWithDomain:@"APIError"
+                                                    code:error.code
+                                                userInfo:@{NSLocalizedDescriptionKey: msg ?: error.localizedDescription}];
+            failure(apiError);
+        }
+    }];
+}
+
 - (void)deleteStoryWithId:(NSInteger)storyId
                   success:(void(^)(APIResponseModel *response))success
                   failure:(StoryAPIFailureBlock)failure {
@@ -797,6 +832,44 @@
                                              userInfo:@{NSLocalizedDescriptionKey: apiResponse.errorMessage}];
             if (failure) failure(error);
         }
+    } failure:^(NSError *error, NSString *msg) {
+        if (failure) {
+            NSError *apiError = [NSError errorWithDomain:@"APIError"
+                                                    code:error.code
+                                                userInfo:@{NSLocalizedDescriptionKey: msg ?: error.localizedDescription}];
+            failure(apiError);
+        }
+    }];
+}
+
+#pragma mark - Story Types and Lengths
+
+- (void)getStoryTypesSuccess:(void(^)(APIResponseModel *response))success
+                     failure:(StoryAPIFailureBlock)failure {
+    
+    [[APIManager shared] GET:[APIPortConfiguration getStoryTypesUrl]
+                   parameter:nil
+                     success:^(id result, id data, NSString *msg) {
+        APIResponseModel *apiResponse = [self parseResponseObject:result];
+        if (success) success(apiResponse);
+    } failure:^(NSError *error, NSString *msg) {
+        if (failure) {
+            NSError *apiError = [NSError errorWithDomain:@"APIError"
+                                                    code:error.code
+                                                userInfo:@{NSLocalizedDescriptionKey: msg ?: error.localizedDescription}];
+            failure(apiError);
+        }
+    }];
+}
+
+- (void)getStoryLengthsSuccess:(void(^)(APIResponseModel *response))success
+                       failure:(StoryAPIFailureBlock)failure {
+    
+    [[APIManager shared] GET:[APIPortConfiguration getStoryLengthsUrl]
+                   parameter:nil
+                     success:^(id result, id data, NSString *msg) {
+        APIResponseModel *apiResponse = [self parseResponseObject:result];
+        if (success) success(apiResponse);
     } failure:^(NSError *error, NSString *msg) {
         if (failure) {
             NSError *apiError = [NSError errorWithDomain:@"APIError"

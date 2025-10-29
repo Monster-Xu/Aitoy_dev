@@ -29,7 +29,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="可查看" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mt2-sh-agQ">
-                        <rect key="frame" x="155" y="35.333333333333336" width="36" height="14.333333333333336"/>
+                        <rect key="frame" x="155" y="35.333333333333336" width="36" height="14"/>
                         <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="12"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -45,14 +45,9 @@
                             <action selector="deviceBtnClick:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="hLE-bo-qto"/>
                         </connections>
                     </button>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="device_search_small" translatesAutoresizingMaskIntoConstraints="NO" id="KRi-ub-haz">
-                        <rect key="frame" x="73" y="11.333333333333336" width="24" height="24"/>
-                    </imageView>
                 </subviews>
                 <constraints>
                     <constraint firstItem="Oi5-Ot-jH0" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="3tc-Ep-WZ8"/>
-                    <constraint firstItem="Oi5-Ot-jH0" firstAttribute="centerY" secondItem="KRi-ub-haz" secondAttribute="centerY" id="4b7-rD-KMR"/>
-                    <constraint firstItem="Oi5-Ot-jH0" firstAttribute="leading" secondItem="KRi-ub-haz" secondAttribute="trailing" constant="10" id="LYN-pF-yCO"/>
                     <constraint firstItem="vNY-X4-Fha" firstAttribute="centerY" secondItem="Mt2-sh-agQ" secondAttribute="centerY" id="Rdn-d3-zco"/>
                     <constraint firstItem="Mt2-sh-agQ" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" constant="-30" id="dC5-0v-nqG"/>
                     <constraint firstItem="vNY-X4-Fha" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" constant="30" id="ikJ-kQ-Zk0"/>
@@ -67,7 +62,4 @@
             <point key="canvasLocation" x="65.648854961832058" y="10.563380281690142"/>
         </tableViewCell>
     </objects>
-    <resources>
-        <image name="device_search_small" width="24" height="24"/>
-    </resources>
 </document>

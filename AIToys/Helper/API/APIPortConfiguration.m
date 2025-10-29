@@ -130,6 +130,11 @@
     return [[APIPortConfiguration baseURL] stringByAppendingString:@"app-api/doll/stories/update"];
 }
 
+/// 编辑失败的故事（重新生成）
++ (NSString *)getUpdateFailedStoryUrl {
+    return [[APIPortConfiguration baseURL] stringByAppendingString:@"app-api/doll/stories/update_fail"];
+}
+
 /// 删除故事
 + (NSString *)getDeleteStoryUrl {
     return [[APIPortConfiguration baseURL] stringByAppendingString:@"app-api/doll/stories/delete"];
@@ -184,5 +189,14 @@
     return [[APIPortConfiguration baseURL] stringByAppendingString:@"app-api/doll/voices/official"];
 }
 
+/// 查询故事类型枚举
++ (NSString *)getStoryTypesUrl {
+    return [[APIPortConfiguration baseURL] stringByAppendingString:@"app-api/doll/stories/types"];
+}
+
+/// 查询故事长度枚举
++ (NSString *)getStoryLengthsUrl {
+    return [[APIPortConfiguration baseURL] stringByAppendingString:@"app-api/doll/stories/lengths"];
+}
 
 @end

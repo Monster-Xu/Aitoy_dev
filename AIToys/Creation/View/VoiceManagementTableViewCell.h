@@ -19,6 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UIButton *playButton;           // 播放按钮
 @property (weak, nonatomic) IBOutlet UIImageView *createNewImageView;
 
+// ✅ 多选编辑模式相关控件
+@property (weak, nonatomic) IBOutlet UIButton *chooseButton;          // 选择按钮
+
 // ✅ XIB中的状态相关控件
 @property (weak, nonatomic) IBOutlet UIView *statusView;             // 状态容器视图
 @property (weak, nonatomic) IBOutlet UIImageView *faildImgView;      // 失败图标
@@ -40,6 +43,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param voice VoiceModel 数据模型
 /// @return YES表示需要显示statusView，cell高度需要增加35px
 + (BOOL)needsStatusViewForVoice:(VoiceModel *)voice;
+
+/// 更新编辑模式状态
+/// @param isEditingMode 是否处于编辑模式
+/// @param isSelected 是否被选中
+- (void)updateEditingMode:(BOOL)isEditingMode isSelected:(BOOL)isSelected;
 
 @end
 

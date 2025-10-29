@@ -62,13 +62,13 @@
     }
     
     NSArray *validLengths = @[@90, @180, @270, @360];
-    if (![validLengths containsObject:@(self.storyLength)]) {
-        return @"故事时长必须是90、180、270或360秒";
+    if (!(self.storyLength>0)) {
+        return @"请选择故事时长";
     }
     
-    if (self.illustrationUrl.length == 0) {
-        return @"插画URL不能为空";
-    }
+//    if (self.illustrationUrl.length == 0) {
+//        return @"插画URL不能为空";
+//    }
     
     return nil;
 }
@@ -137,6 +137,79 @@
     }
     
     return [dict copy];
+}
+
+@end
+
+#pragma mark - UpdateFailedStoryRequestModel
+
+@implementation UpdateFailedStoryRequestModel
+
+- (instancetype)initWithStoryId:(NSInteger)storyId
+                       familyId:(NSInteger)familyId
+                      storyName:(NSString *)storyName
+                   storySummary:(NSString *)storySummary
+                      storyType:(StoryType)storyType
+                 protagonistName:(NSString *)protagonistName
+                    storyLength:(NSInteger)storyLength {
+    if (self = [super init]) {
+        _storyId = storyId;
+        _familyId = familyId;
+        _storyName = [storyName copy];
+        _storySummary = [storySummary copy];
+        _storyType = storyType;
+        _protagonistName = [protagonistName copy];
+        _storyLength = storyLength;
+    }
+    return self;
+}
+
+- (BOOL)isValid {
+    return [self validationError] == nil;
+}
+
+- (NSString *)validationError {
+    if (self.storyId <= 0) {
+        return @"故事ID不能为空";
+    }
+    
+    if (self.familyId <= 0) {
+        return @"家庭ID不能为空";
+    }
+    
+    if (self.storyName.length == 0 || self.storyName.length > 120) {
+        return @"故事名称长度必须在1-120字符之间";
+    }
+    
+    if (self.storySummary.length == 0 || self.storySummary.length > 2400) {
+        return @"故事摘要长度必须在1-2400字符之间";
+    }
+    
+    if (self.storyType < 1 || self.storyType > 7) {
+        return @"故事类型必须在1-7之间";
+    }
+    
+    if (self.protagonistName.length == 0 || self.protagonistName.length > 30) {
+        return @"主角名称长度必须在1-30字符之间";
+    }
+    
+    if (self.storyLength <= 0) {
+        return @"故事长度必须大于0";
+    }
+    
+    return nil;
+}
+
+- (NSDictionary *)toDictionary {
+    return @{
+        @"storyId": @(self.storyId),
+        @"familyId": @(self.familyId),
+        @"storyName": self.storyName ?: @"",
+        @"storySummary": self.storySummary ?: @"",
+        @"storyType": @(self.storyType),
+        @"protagonistName": self.protagonistName ?: @"",
+        @"storyLength": @(self.storyLength)
+    };
 }
 
 @end

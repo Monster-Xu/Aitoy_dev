@@ -247,7 +247,7 @@
     }else if(indexPath.section == 2){
         if(self.scanStatus == 1){
             DeviceHavenFindCell *cell = [tableView dequeueReusableCellWithIdentifier:@"DeviceHavenFindCell" forIndexPath:indexPath];
-            cell.deviceList = self.deviceInfoList;
+            cell.deviceList = self.deviceList;
             cell.itemClickBlock = ^(NSInteger index) {
                 weakSelf.selectIndex = index;
                 [self loadWifiDataWithDeviceInfo:weakSelf.deviceList[index]];

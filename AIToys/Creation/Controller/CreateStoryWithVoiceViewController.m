@@ -1099,51 +1099,51 @@
 //    }
 }
 
-- (IBAction)addHeaderImageBtnClick:(id)sender {
-    [self showIllustrationPicker];
-}
-- (void)showIllustrationPicker {
-    SelectIllustrationVC *vc = [[SelectIllustrationVC alloc] init];
-    
-    // 设置当前已选择的图片URL，以便在选择器中显示选中状态
-    if (self.selectedIllustrationUrl && self.selectedIllustrationUrl.length > 0) {
-        vc.imgUrl = self.selectedIllustrationUrl;
-        NSLog(@"🖼️ 传递已选择的图片URL: %@", self.selectedIllustrationUrl);
-    }
-    
-    // 设置回调
-    vc.sureBlock = ^(NSString *imgUrl) {
-        NSLog(@"选中的插画: %@", imgUrl);
-        
-        // ✅ 检查插画是否真的有变更
-        NSString *currentUrl = imgUrl ?: @"";
-        NSString *originalUrl = self.originalIllustrationUrl ?: @"";
-        
-        // 保存选中的插画URL
-        self.selectedIllustrationUrl = imgUrl;
-        
-        // ✅ 编辑模式下检测插画变化
-        if (self.isEditMode && ![currentUrl isEqualToString:originalUrl]) {
-            self.hasUnsavedChanges = YES;
-            NSLog(@"🔄 插画发生变更: '%@' → '%@'", originalUrl, currentUrl);
-        }
-        
-        // 使用插画URL设置按钮背景
-        [self.voiceHeaderImageBtn sd_setImageWithURL:[NSURL URLWithString:imgUrl]
-                                             forState:UIControlStateNormal
-                                     placeholderImage:nil
-                                              options:SDWebImageRefreshCached
-                                            completed:nil];
-        self.deletHeaderBtn.hidden = NO;
-        NSLog(@"✅ 插画已选中，URL已保存");
-    };
-    
-    // 显示
-    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [self presentViewController:vc animated:NO completion:^{
-        [vc showView];
-    }];
-}
+//- (IBAction)addHeaderImageBtnClick:(id)sender {
+//    [self showIllustrationPicker];
+//}
+//- (void)showIllustrationPicker {
+//    SelectIllustrationVC *vc = [[SelectIllustrationVC alloc] init];
+//    
+//    // 设置当前已选择的图片URL，以便在选择器中显示选中状态
+//    if (self.selectedIllustrationUrl && self.selectedIllustrationUrl.length > 0) {
+//        vc.imgUrl = self.selectedIllustrationUrl;
+//        NSLog(@"🖼️ 传递已选择的图片URL: %@", self.selectedIllustrationUrl);
+//    }
+//    
+//    // 设置回调
+//    vc.sureBlock = ^(NSString *imgUrl) {
+//        NSLog(@"选中的插画: %@", imgUrl);
+//        
+//        // ✅ 检查插画是否真的有变更
+//        NSString *currentUrl = imgUrl ?: @"";
+//        NSString *originalUrl = self.originalIllustrationUrl ?: @"";
+//        
+//        // 保存选中的插画URL
+//        self.selectedIllustrationUrl = imgUrl;
+//        
+//        // ✅ 编辑模式下检测插画变化
+//        if (self.isEditMode && ![currentUrl isEqualToString:originalUrl]) {
+//            self.hasUnsavedChanges = YES;
+//            NSLog(@"🔄 插画发生变更: '%@' → '%@'", originalUrl, currentUrl);
+//        }
+//        
+//        // 使用插画URL设置按钮背景
+//        [self.voiceHeaderImageBtn sd_setImageWithURL:[NSURL URLWithString:imgUrl]
+//                                             forState:UIControlStateNormal
+//                                     placeholderImage:nil
+//                                              options:SDWebImageRefreshCached
+//                                            completed:nil];
+//        self.deletHeaderBtn.hidden = NO;
+//        NSLog(@"✅ 插画已选中，URL已保存");
+//    };
+//    
+//    // 显示
+//    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+//    [self presentViewController:vc animated:NO completion:^{
+//        [vc showView];
+//    }];
+//}
 
 - (void)removeImageButtonTapped {
     // ✅ 编辑模式下检测插画变化
@@ -1157,7 +1157,7 @@
     
     self.selectedIllustrationUrl = nil;
     [self.voiceHeaderImageBtn setImage:nil forState:UIControlStateNormal];
-    self.deletHeaderBtn.hidden = YES;
+//    self.deletHeaderBtn.hidden = YES;
 }
 
 

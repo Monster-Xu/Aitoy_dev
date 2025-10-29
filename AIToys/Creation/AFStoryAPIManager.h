@@ -41,10 +41,23 @@ typedef void(^AudioUploadFailureBlock)(NSError *error);
             success:(void(^)(APIResponseModel *response))success
             failure:(StoryAPIFailureBlock)failure;
 
+// 编辑失败的故事（重新生成）
+- (void)updateFailedStory:(UpdateFailedStoryRequestModel *)request
+                  success:(void(^)(APIResponseModel *response))success
+                  failure:(StoryAPIFailureBlock)failure;
+
 // 删除故事
 - (void)deleteStoryWithId:(NSInteger)storyId
                   success:(void(^)(APIResponseModel *response))success
                   failure:(StoryAPIFailureBlock)failure;
+
+// 查询故事类型枚举
+- (void)getStoryTypesSuccess:(void(^)(APIResponseModel *response))success
+                    failure:(StoryAPIFailureBlock)failure;
+
+// 查询故事长度枚举
+- (void)getStoryLengthsSuccess:(void(^)(APIResponseModel *response))success
+                      failure:(StoryAPIFailureBlock)failure;
 
 /**
  * 合成故事音频

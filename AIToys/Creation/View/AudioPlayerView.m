@@ -26,9 +26,7 @@
 @property (nonatomic, strong) UILabel *timeLabel; // 合并的时间标签
 @property (nonatomic, strong) MASConstraint *timeLabelCenterXConstraint; // 时间标签的X轴约束
 
-// 下载动画相关
-@property (nonatomic, strong) CAGradientLayer *glowBorderLayer; // 流光边框层
-@property (nonatomic, strong) CALayer *glowMaskLayer; // 遮罩层
+// 移除流光动画相关属性
 
 // 音频相关
 @property (nonatomic, strong) AVAudioPlayer *audioPlayer;
@@ -49,6 +47,7 @@
 // 新增后台播放相关属性
 @property (nonatomic, assign) BOOL isBackgroundAudioConfigured;
 @property (nonatomic, strong) NSDictionary *nowPlayingInfo;
+@property (nonatomic, assign) BOOL isBackgroundPlayMode; // 新增：是否为后台播放模式
 
 // 新增拖动相关属性
 @property (nonatomic, assign) BOOL isDragging;
@@ -62,19 +61,64 @@
 @property (nonatomic, assign) CGPoint lastPanPoint;         // 上一次拖动点
 @property (nonatomic, strong) CADisplayLink *displayLink;   // 用于平滑动画的定时器
 
+// 全局单例管理
+@property (nonatomic, strong, class, readonly) NSMutableSet<AudioPlayerView *> *activePlayerInstances;
+
 @end
 
+// 全局单例管理的实现
+static NSMutableSet<AudioPlayerView *> *_activePlayerInstances = nil;
+
 @implementation AudioPlayerView
+
+#pragma mark - 全局单例管理
+
++ (NSMutableSet<AudioPlayerView *> *)activePlayerInstances {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _activePlayerInstances = [[NSMutableSet alloc] init];
+    });
+    return _activePlayerInstances;
+}
+
+// 停止所有其他播放器实例
++ (void)stopAllOtherPlayers:(AudioPlayerView *)currentPlayer {
+    NSSet *instances = [self.activePlayerInstances copy]; // 创建副本以避免并发修改
+    for (AudioPlayerView *player in instances) {
+        if (player != currentPlayer && [player isPlaying]) {
+            NSLog(@"🛑 停止其他播放器实例");
+            [player stop];
+            [player removeFromSuperview];
+            [self.activePlayerInstances removeObject:player];
+        }
+    }
+}
+
+// 注册播放器实例
+- (void)registerInstance {
+    [AudioPlayerView.activePlayerInstances addObject:self];
+    NSLog(@"📝 注册播放器实例，当前总数: %lu", (unsigned long)AudioPlayerView.activePlayerInstances.count);
+}
+
+// 注销播放器实例
+- (void)unregisterInstance {
+    [AudioPlayerView.activePlayerInstances removeObject:self];
+    NSLog(@"🗑️ 注销播放器实例，当前总数: %lu", (unsigned long)AudioPlayerView.activePlayerInstances.count);
+}
 
 #pragma mark - Initialization
 
 - (instancetype)initWithAudioURL:(NSString *)audioURL storyTitle:(NSString *)title coverImageURL:(NSString *)coverImageURL {
     self = [super init];
     if (self) {
+        // 停止所有其他播放器实例
+        [AudioPlayerView stopAllOtherPlayers:self];
+        
         self.audioURL = audioURL;
         self.storyTitle = title ?: @"Story Audio";
         self.coverImageURL = coverImageURL;
         self.isCancelledByUser = NO; // 初始化为未取消
+        self.isBackgroundPlayMode = NO; // 默认不是后台播放模式
         
         // 初始化拖动行为控制属性
         self.enableEdgeSnapping = NO;   // 默认不启用边缘吸附，允许自由拖动
@@ -85,18 +129,63 @@
         self.dragResistanceEdge = 0.3;   // 边缘阻力系数
         self.dragDecelerationRate = 0.92; // 减速系数（0-1，越小减速越快）
         
+        // 注册实例
+        [self registerInstance];
+        
         [self setupUI];
         [self setupAudioPlayer];
     }
     return self;
 }
 
+// 新增的后台播放初始化方法
+- (instancetype)initWithAudioURL:(NSString *)audioURL backgroundPlay:(BOOL)backgroundPlay {
+    self = [super init];
+    if (self) {
+        // 停止所有其他播放器实例
+        [AudioPlayerView stopAllOtherPlayers:self];
+        
+        self.audioURL = audioURL;
+        self.storyTitle = @"Story Audio";
+        self.coverImageURL = nil;
+        self.isCancelledByUser = NO;
+        self.isBackgroundPlayMode = backgroundPlay;
+        
+        // 注册实例
+        [self registerInstance];
+        
+        if (!backgroundPlay) {
+            // 如果不是后台播放模式，设置UI
+            // 初始化拖动行为控制属性
+            self.enableEdgeSnapping = NO;
+            self.allowOutOfBounds = NO;
+            self.enableFullScreenDrag = YES;
+            
+            // 初始化拖动参数
+            self.dragResistanceEdge = 0.3;
+            self.dragDecelerationRate = 0.92;
+            
+            [self setupUI];
+        }
+        
+        [self setupAudioPlayer];
+    }
+    return self;
+}
+
 - (void)dealloc {
+    // 注销实例
+    [self unregisterInstance];
+    
     [self.progressTimer invalidate];
     [self.audioPlayer stop];
     [self.downloadTask cancel]; // 取消下载任务
-    [self stopGlowBorderAnimation]; // 停止动画
-    [self stopDisplayLink]; // 停止显示链
+    
+    // 停止显示链
+    if (self.displayLink) {
+        [self.displayLink invalidate];
+        self.displayLink = nil;
+    }
     
     // 移除手势和通知观察者
     if (self.panGesture) {
@@ -110,6 +199,12 @@
 #pragma mark - Setup Methods
 
 - (void)setupUI {
+    // 如果是后台播放模式，跳过UI创建
+    if (self.isBackgroundPlayMode) {
+        NSLog(@"🎵 后台播放模式，跳过UI创建");
+        return;
+    }
+    
     self.frame = [UIScreen mainScreen].bounds;
     self.backgroundColor = [UIColor clearColor]; // 透明背景，不变黑
     self.alpha = 0;
@@ -128,7 +223,7 @@
     // 容器视图
     self.containerView = self.backgroundView.contentView;
     
-    // 修改：边框为浅灰色
+    // 设置浅灰色边框，始终保持显示
     self.backgroundView.layer.borderWidth = 2.0;
     self.backgroundView.layer.borderColor = [UIColor colorWithRed:0.85 green:0.85 blue:0.85 alpha:1.0].CGColor;
     
@@ -203,7 +298,7 @@
     if (self.coverImageURL&&self.coverImageURL.length>0) {
         [self.coverImageView sd_setImageWithURL:[NSURL URLWithString:self.coverImageURL]];
     }else{
-        self.coverImageView.image = [UIImage imageNamed:@"create_chooseVoice"] ;
+        self.coverImageView.image = [UIImage imageNamed:@"lanch_logo"] ;
     }
     
    
@@ -292,156 +387,7 @@
     return image;
 }
 
-#pragma mark - Loading Animation Methods
 
-// 创建高级配色的跑马灯流光边框动画
-- (void)createGlowBorderAnimation {
-    if (self.glowBorderLayer) {
-        NSLog(@"⚠️ 流光层已存在，跳过创建");
-        return;
-    }
-    
-    // 强制布局更新，确保 bounds 正确
-    [self.backgroundView layoutIfNeeded];
-    
-    CGRect bounds = self.backgroundView.bounds;
-    NSLog(@"🎨 创建高级跑马灯流光动画 - backgroundView bounds: %.2f x %.2f", bounds.size.width, bounds.size.height);
-    
-    if (bounds.size.width == 0 || bounds.size.height == 0) {
-        NSLog(@"⚠️ backgroundView bounds 为空，延迟创建动画");
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self createGlowBorderAnimation];
-        });
-        return;
-    }
-    
-    // 创建渐变层作为流光效果
-    self.glowBorderLayer = [CAGradientLayer layer];
-    self.glowBorderLayer.frame = bounds;
-    self.glowBorderLayer.cornerRadius = 35;
-    
-    // 高级配色方案 - 深蓝紫渐变，更显高级感
-    NSArray *colors = @[
-        (id)[UIColor colorWithRed:0.1 green:0.1 blue:0.4 alpha:1.0].CGColor,     // 深蓝色
-        (id)[UIColor colorWithRed:0.3 green:0.1 blue:0.5 alpha:1.0].CGColor,     // 蓝紫色
-        (id)[UIColor colorWithRed:0.5 green:0.2 blue:0.6 alpha:1.0].CGColor,     // 紫色
-        (id)[UIColor colorWithRed:0.2 green:0.4 blue:0.7 alpha:1.0].CGColor,     // 宝蓝色
-        (id)[UIColor colorWithRed:0.1 green:0.3 blue:0.6 alpha:1.0].CGColor,     // 深宝蓝
-        (id)[UIColor colorWithRed:0.1 green:0.1 blue:0.4 alpha:1.0].CGColor,     // 深蓝色
-        (id)[UIColor colorWithRed:0.3 green:0.1 blue:0.5 alpha:1.0].CGColor,     // 蓝紫色
-        (id)[UIColor colorWithRed:0.5 green:0.2 blue:0.6 alpha:1.0].CGColor      // 紫色
-    ];
-    self.glowBorderLayer.colors = colors;
-    
-    // 设置渐变位置，创建连续的色彩带
-    self.glowBorderLayer.locations = @[@0.0, @0.125, @0.25, @0.375, @0.5, @0.625, @0.75, @0.875];
-    
-    // 设置渐变方向 - 水平方向，便于实现跑马灯效果
-    self.glowBorderLayer.startPoint = CGPointMake(0, 0.5);
-    self.glowBorderLayer.endPoint = CGPointMake(1, 0.5);
-    
-    // 创建边框遮罩
-    CAShapeLayer *maskLayer = [CAShapeLayer layer];
-    maskLayer.frame = bounds;
-    
-    // 外边框路径
-    UIBezierPath *outerPath = [UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:35];
-    
-    // 内边框路径（缩小形成边框效果）
-    CGFloat borderWidth = 3.0;
-    CGRect innerRect = CGRectInset(bounds, borderWidth, borderWidth);
-    UIBezierPath *innerPath = [UIBezierPath bezierPathWithRoundedRect:innerRect cornerRadius:35 - borderWidth];
-    
-    // 使用 evenOddFillRule 创建边框效果
-    [outerPath appendPath:innerPath];
-    outerPath.usesEvenOddFillRule = YES;
-    
-    maskLayer.path = outerPath.CGPath;
-    maskLayer.fillRule = kCAFillRuleEvenOdd;
-    
-    self.glowBorderLayer.mask = maskLayer;
-    self.glowMaskLayer = maskLayer;
-    
-    // 添加到背景视图的最上层
-    [self.backgroundView.layer addSublayer:self.glowBorderLayer];
-    
-    NSLog(@"✨ 已创建高级跑马灯流光边框动画层");
-}
-
-// 开始高级跑马灯流光边框动画
-- (void)startGlowBorderAnimation {
-    [self createGlowBorderAnimation];
-    
-    if (!self.glowBorderLayer) {
-        NSLog(@"⚠️ 流光层创建失败，无法启动动画");
-        return;
-    }
-    
-    // 下载时隐藏浅灰色边框，显示流光效果
-    self.backgroundView.layer.borderColor = [UIColor clearColor].CGColor;
-    
-    // 创建跑马灯动画 - 通过移动渐变位置实现
-    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"locations"];
-    animation.fromValue = @[@0.0, @0.125, @0.25, @0.375, @0.5, @0.625, @0.75, @0.875];
-    animation.toValue = @[@0.125, @0.25, @0.375, @0.5, @0.625, @0.75, @0.875, @1.0];
-    animation.duration = 2.0; // 稍微慢一点，更显高级感
-    animation.repeatCount = HUGE_VALF;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-    
-    // 添加微妙的颜色变化动画，让色彩更加高级
-    CAKeyframeAnimation *colorAnimation = [CAKeyframeAnimation animationWithKeyPath:@"colors"];
-    
-    // 高级配色方案1 - 深蓝紫系
-    NSArray *colorSet1 = @[
-        (id)[UIColor colorWithRed:0.1 green:0.1 blue:0.4 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.3 green:0.1 blue:0.5 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.5 green:0.2 blue:0.6 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.2 green:0.4 blue:0.7 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.1 green:0.3 blue:0.6 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.1 green:0.1 blue:0.4 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.3 green:0.1 blue:0.5 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.5 green:0.2 blue:0.6 alpha:1.0].CGColor
-    ];
-    
-    // 高级配色方案2 - 稍微提亮
-    NSArray *colorSet2 = @[
-        (id)[UIColor colorWithRed:0.15 green:0.15 blue:0.45 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.35 green:0.15 blue:0.55 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.55 green:0.25 blue:0.65 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.25 green:0.45 blue:0.75 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.15 green:0.35 blue:0.65 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.15 green:0.15 blue:0.45 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.35 green:0.15 blue:0.55 alpha:1.0].CGColor,
-        (id)[UIColor colorWithRed:0.55 green:0.25 blue:0.65 alpha:1.0].CGColor
-    ];
-    
-    colorAnimation.values = @[colorSet1, colorSet2, colorSet1];
-    colorAnimation.keyTimes = @[@0.0, @0.5, @1.0];
-    colorAnimation.duration = 4.0; // 更慢的颜色变化
-    colorAnimation.repeatCount = HUGE_VALF;
-    colorAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    
-    // 组合动画
-    [self.glowBorderLayer addAnimation:animation forKey:@"marqueeAnimation"];
-    [self.glowBorderLayer addAnimation:colorAnimation forKey:@"colorAnimation"];
-    
-    NSLog(@"✨ 高级跑马灯流光边框动画已开始");
-}
-
-// 停止流光边框动画
-- (void)stopGlowBorderAnimation {
-    if (self.glowBorderLayer) {
-        [self.glowBorderLayer removeAllAnimations];
-        [self.glowBorderLayer removeFromSuperlayer];
-        self.glowBorderLayer = nil;
-        self.glowMaskLayer = nil;
-        
-        // 停止动画后恢复浅灰色边框
-        self.backgroundView.layer.borderColor = [UIColor colorWithRed:0.85 green:0.85 blue:0.85 alpha:1.0].CGColor;
-        
-        NSLog(@"✨ 流光边框动画已停止，恢复浅灰色边框");
-    }
-}
 
 - (void)setupConstraints {
     // 获取屏幕宽度进行对比
@@ -564,15 +510,7 @@
     // 重置取消标志
     self.isCancelledByUser = NO;
     
-    // 开始流光边框动画
-    [self startGlowBorderAnimation];
-    
     self.downloadTask = [[NSURLSession sharedSession] downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-        // 下载完成后停止流光动画
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self stopGlowBorderAnimation];
-        });
         
         // ✅ 检查用户是否已经关闭了播放器
         if (self.isCancelledByUser) {
@@ -632,9 +570,6 @@
 }
 
 - (void)showErrorMessage:(NSString *)message {
-    // 停止流光动画
-    [self stopGlowBorderAnimation];
-    
     self.titleLabel.text = message;
     self.titleLabel.textColor = [UIColor systemRedColor];
     
@@ -903,9 +838,6 @@
         NSLog(@"⏹️ 已取消音频下载任务");
     }
     
-    // ✅ 停止流光动画
-    [self stopGlowBorderAnimation];
-    
     CGRect screenBounds = [UIScreen mainScreen].bounds;
         CGPoint hideCenter = CGPointMake(screenBounds.size.width / 2,
                                        screenBounds.size.height + self.bounds.size.height / 2);
@@ -925,12 +857,36 @@
 
 - (void)play {
     if (self.audioPlayer) {
+        // 在开始播放前，停止所有其他播放器
+        [AudioPlayerView stopAllOtherPlayers:self];
+        
         [self.audioPlayer play];
         [self startProgressTimer];
-        [self updatePlayButtonImage:YES];
+        
+        // 只在非后台播放模式下更新UI
+        if (!self.isBackgroundPlayMode) {
+            [self updatePlayButtonImage:YES];
+        }
         
         // 更新锁屏界面信息
         [self updateNowPlayingInfo];
+        
+        if ([self.delegate respondsToSelector:@selector(audioPlayerDidStartPlaying)]) {
+            [self.delegate audioPlayerDidStartPlaying];
+        }
+    }
+}
+
+// 后台播放方法（直接播放，不显示UI）
+- (void)playInBackground {
+    if (self.audioPlayer) {
+        // 配置后台音频会话
+        [self setupBackgroundAudioSession];
+        
+        [self.audioPlayer play];
+        [self startProgressTimer];
+        
+        NSLog(@"🎵 开始后台播放音频");
         
         if ([self.delegate respondsToSelector:@selector(audioPlayerDidStartPlaying)]) {
             [self.delegate audioPlayerDidStartPlaying];
@@ -942,10 +898,13 @@
     if (self.audioPlayer) {
         [self.audioPlayer pause];
         [self stopProgressTimer];
-        [self updatePlayButtonImage:NO];
         
-        // 更新锁屏界面信息
-                [self updateNowPlayingInfo];
+        // 只在非后台播放模式下更新UI
+        if (!self.isBackgroundPlayMode) {
+            [self updatePlayButtonImage:NO];
+            // 更新锁屏界面信息
+            [self updateNowPlayingInfo];
+        }
         
         if ([self.delegate respondsToSelector:@selector(audioPlayerDidPause)]) {
             [self.delegate audioPlayerDidPause];
@@ -958,8 +917,15 @@
         [self.audioPlayer stop];
         self.audioPlayer.currentTime = 0;
         [self stopProgressTimer];
-        [self updatePlayButtonImage:NO];
-        [self updateProgress];
+        
+        // 只在非后台播放模式下更新UI
+        if (!self.isBackgroundPlayMode) {
+            [self updatePlayButtonImage:NO];
+            [self updateProgress];
+        }
+        
+        // 停止播放时注销实例
+        [self unregisterInstance];
     }
 }
 -(void)rePlay{
@@ -980,6 +946,11 @@
 #pragma mark - Private Methods
 
 - (void)updatePlayButtonImage:(BOOL)isPlaying {
+    // 后台播放模式下不更新UI
+    if (self.isBackgroundPlayMode || !self.playButton) {
+        return;
+    }
+    
     NSString *imageName = isPlaying ? @"暂停" : @"播放";
     [self.playButton setImage:[UIImage imageNamed:imageName] forState:UIControlStateNormal];
 }
@@ -1001,10 +972,12 @@
     NSTimeInterval duration = self.audioPlayer.duration;
     
     if (duration > 0) {
-        self.progressSlider.value = currentTime;
-        
-        // 更新时间标签显示当前时间并跟随滑块位置
-        [self updateTimeLabelPosition];
+        // 只在非后台播放模式下更新UI
+        if (!self.isBackgroundPlayMode && self.progressSlider) {
+            self.progressSlider.value = currentTime;
+            // 更新时间标签显示当前时间并跟随滑块位置
+            [self updateTimeLabelPosition];
+        }
         
         // 定期更新锁屏界面信息（每0.5秒更新一次）
         static NSTimeInterval lastUpdateTime = 0;
@@ -1029,7 +1002,8 @@
 
 // 更新时间标签位置，跟随滑块移动
 - (void)updateTimeLabelPosition {
-    if (!self.audioPlayer || !self.timeLabelCenterXConstraint) return;
+    // 后台播放模式下不需要更新UI
+    if (self.isBackgroundPlayMode || !self.audioPlayer || !self.timeLabelCenterXConstraint) return;
     
     // 更新时间文本（显示当前时间/总时长）
     NSTimeInterval currentTime = self.audioPlayer.currentTime;
@@ -1123,11 +1097,14 @@
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
     [self stopProgressTimer];
-    [self updatePlayButtonImage:NO];
     
-    // 重置播放位置
-    self.audioPlayer.currentTime = 0;
-    [self updateProgress];
+    // 只在非后台播放模式下更新UI
+    if (!self.isBackgroundPlayMode) {
+        [self updatePlayButtonImage:NO];
+        // 重置播放位置
+        self.audioPlayer.currentTime = 0;
+        [self updateProgress];
+    }
     
     if ([self.delegate respondsToSelector:@selector(audioPlayerDidFinish)]) {
         [self.delegate audioPlayerDidFinish];
@@ -1368,7 +1345,6 @@
 // 开始拖动
 - (void)handleDragBegan:(CGPoint)location {
     // 停止任何进行中的动画
-    [self stopDisplayLink];
     [self.layer removeAllAnimations];
     
     // 记录初始状态
@@ -1527,8 +1503,6 @@
 
 // 启动惯性动画
 - (void)startInertialAnimationWithVelocity:(CGPoint)velocity {
-    [self stopDisplayLink];
-    
     // 创建显示链用于平滑的60fps动画
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(updateInertialMovement:)];
     [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
@@ -1572,7 +1546,10 @@
     
     if (speed < 50 || isAtBoundary) {
         // 速度太小或碰到边界，停止惯性动画
-        [self stopDisplayLink];
+        if (self.displayLink) {
+            [self.displayLink invalidate];
+            self.displayLink = nil;
+        }
         [self handleBoundaryBounceback];
         return;
     }
@@ -1582,13 +1559,7 @@
     objc_setAssociatedObject(self, "velocityY", @(velocityY), OBJC_ASSOCIATION_RETAIN);
 }
 
-// 停止显示链
-- (void)stopDisplayLink {
-    if (self.displayLink) {
-        [self.displayLink invalidate];
-        self.displayLink = nil;
-    }
-}
+
 
 // 检查是否在边界附近
 - (BOOL)isAtBoundary:(CGPoint)center {

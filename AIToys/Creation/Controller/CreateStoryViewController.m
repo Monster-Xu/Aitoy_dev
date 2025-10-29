@@ -16,17 +16,24 @@
 #import <Photos/Photos.h>
 #import <Masonry/Masonry.h>
 #import <SDWebImage/SDWebImage.h>
+#import <SVProgressHUD/SVProgressHUD.h>
 #import "AFStoryAPIManager.h"
 #import "APIRequestModel.h"
 #import "APIResponseModel.h"
 #import "SelectAvatarVC.h"
 #import "SelectIllustrationVC.h"
+#import "CoreArchive.h"
 
 @interface CreateStoryViewController () <UITextFieldDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIGestureRecognizerDelegate>
 
 // UI Components
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIView *contentView;
+
+// Loading View
+@property (nonatomic, strong) UIView *loadingView;
+@property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
+@property (nonatomic, strong) UILabel *loadingLabel;
 
 // Card Containers
 @property (nonatomic, strong) UIView *themeCardView;
@@ -42,12 +49,12 @@
 @property (nonatomic, strong) UILabel *themePlaceholderLabel;
 
 // Story Illustration
-@property (nonatomic, strong) UILabel *illustrationLabel;
-@property (nonatomic, strong) UIView *imageContainerView;
-@property (nonatomic, strong) UIImageView *selectedImageView;
-@property (nonatomic, strong) UIButton *removeImageButton;
-@property (nonatomic, strong) UILabel *addImageLabel;
-@property (nonatomic, strong) UIImageView *addImageIcon;
+//@property (nonatomic, strong) UILabel *illustrationLabel;
+//@property (nonatomic, strong) UIView *imageContainerView;
+//@property (nonatomic, strong) UIImageView *selectedImageView;
+//@property (nonatomic, strong) UIButton *removeImageButton;
+//@property (nonatomic, strong) UILabel *addImageLabel;
+//@property (nonatomic, strong) UIImageView *addImageIcon;
 
 // Story Content
 @property (nonatomic, strong) UILabel *contentLabel;
@@ -96,34 +103,31 @@
 @property (nonatomic, strong) NSArray<NSString *> *storyTypes;
 @property (nonatomic, strong) NSArray<NSString *> *storyLengths;
 
+// 故事类型的code映射（用于与服务器数据匹配）
+@property (nonatomic, strong) NSArray<NSNumber *> *storyTypeCodes;
+
+// 故事长度的seconds映射（用于与服务器数据匹配）
+@property (nonatomic, strong) NSArray<NSNumber *> *storyLengthSeconds;
+
 @end
 
 @implementation CreateStoryViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     // 设置导航栏
     self.title = @"Create Story";
     self.view.backgroundColor = [UIColor colorWithRed:0xF6/255.0 green:0xF7/255.0 blue:0xFB/255.0 alpha:1.0];
     [self.navigationController.navigationBar setBarTintColor:[UIColor colorWithRed:0xF6/255.0 green:0xF7/255.0 blue:0xFB/255.0 alpha:1.0]];
     
+    // 显示自定义加载视图
+    [self showCustomLoadingView];
+    
     // 自定义返回按钮，拦截返回事件
     [self setupCustomBackButton];
     
-    // 初始化数据
+    // 初始化数据（数据加载完成后会在回调中显示UI）
     [self setupData];
-    
-    [self setupUI];
-    [self setupSpeechRecognition];
-    
-    // ✅ UI 创建完成后，如果有传入的故事模型，设置表单数据
-    if (self.storyModel) {
-        [self setupFormWithStoryModel:self.storyModel];
-    } else {
-        // 如果没有故事模型，确保隐藏失败横幅
-        [self hideFailureBanner];
-    }
     
     // 添加键盘通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
@@ -150,9 +154,82 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self hideCustomLoadingView];
 }
 
 #pragma mark - Setup Methods
+
+/// 显示自定义加载视图
+- (void)showCustomLoadingView {
+    // 创建加载视图背景（蒙层效果）
+    self.loadingView = [[UIView alloc] init];
+    self.loadingView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.1]; // 黑色半透明蒙层
+    [self.view addSubview:self.loadingView];
+    
+    [self.loadingView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(self.view);
+    }];
+    
+    // 创建加载内容容器（类似SVProgressHUD的圆角容器）
+    UIView *loadingContainer = [[UIView alloc] init];
+    loadingContainer.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.8]; // 深色半透明背景
+    loadingContainer.layer.cornerRadius = 12;
+    loadingContainer.layer.masksToBounds = YES;
+    [self.loadingView addSubview:loadingContainer];
+    
+    [loadingContainer mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.center.equalTo(self.loadingView);
+        make.width.height.mas_equalTo(120);
+    }];
+    
+    // 创建活动指示器（白色）
+    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
+    self.activityIndicator.color = [UIColor whiteColor]; // 设置为白色
+    self.activityIndicator.hidesWhenStopped = YES;
+    [loadingContainer addSubview:self.activityIndicator];
+    
+    [self.activityIndicator mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(loadingContainer);
+        make.centerY.equalTo(loadingContainer).offset(-15);
+    }];
+    
+    // 创建加载文字（白色）
+    self.loadingLabel = [[UILabel alloc] init];
+    self.loadingLabel.text = @"加载中...";
+    self.loadingLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
+    self.loadingLabel.textColor = [UIColor whiteColor]; // 设置为白色
+    self.loadingLabel.textAlignment = NSTextAlignmentCenter;
+    [loadingContainer addSubview:self.loadingLabel];
+    
+    [self.loadingLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(self.activityIndicator.mas_bottom).offset(12);
+        make.centerX.equalTo(loadingContainer);
+        make.left.greaterThanOrEqualTo(loadingContainer).offset(12);
+        make.right.lessThanOrEqualTo(loadingContainer).offset(-12);
+    }];
+    
+    // 开始动画
+    [self.activityIndicator startAnimating];
+}
+
+/// 隐藏自定义加载视图
+- (void)hideCustomLoadingView {
+    if (self.loadingView) {
+        [self.activityIndicator stopAnimating];
+        // 立即移除，不使用淡出动画
+        [self.loadingView removeFromSuperview];
+        self.loadingView = nil;
+        self.activityIndicator = nil;
+        self.loadingLabel = nil;
+    }
+}
+
+/// 更新加载文字
+- (void)updateLoadingText:(NSString *)text {
+    if (self.loadingLabel) {
+        self.loadingLabel.text = text;
+    }
+}
 
 - (void)setupCustomBackButton {
     // 隐藏默认的返回按钮
@@ -186,10 +263,10 @@
         return YES;
     }
     
-    // 检查是否选择了图片
-    if (self.selectedImage || self.selectedIllustrationUrl) {
-        return YES;
-    }
+//    // 检查是否选择了图片
+//    if (self.selectedImage || self.selectedIllustrationUrl) {
+//        return YES;
+//    }
     
     // 检查故事内容
     if (self.contentTextView.text.length > 0) {
@@ -241,15 +318,252 @@
 }
 
 - (void)setupData {
-    // 初始化故事类型数据
-    self.storyTypes = @[@"Fairy Tale", @"Fable", @"Adventure", @"Superhero", @"Science Fiction", @"Educational", @"Bedtime Story"];
-    
-    // 初始化故事时长数据
-    self.storyLengths = @[@"1min 30s", @"3min", @"4.5min", @"6min"];
-    
     // 默认值
     self.selectedTypeIndex = -1;
     self.selectedLengthIndex = -1;
+    
+    // 首先设置默认数据，确保界面可以显示
+    [self setDefaultStoryTypes];
+    [self setDefaultStoryLengths];
+    
+    // 检查是否有传入的故事模型且是失败状态
+    if (self.storyModel && [self isStoryModelInFailedState:self.storyModel]) {
+        // 高优先级：先获取故事详情，再获取类型和长度数据
+        [self loadStoryDetailAndOtherData];
+    } else {
+        // 普通情况：只获取类型和长度数据
+        [self loadStoryTypesAndLengths];
+    }
+}
+
+/// 判断故事模型是否处于失败状态
+- (BOOL)isStoryModelInFailedState:(VoiceStoryModel *)storyModel {
+    return storyModel.storyStatus == StoryStatusGenerateFailed || 
+           storyModel.storyStatus == StoryStatusAudioFailed;
+}
+
+#pragma mark - API Methods
+
+/// 加载故事详情和其他数据（优先级模式）
+- (void)loadStoryDetailAndOtherData {
+    NSLog(@"🎯 高优先级模式：先获取故事详情，再获取其他数据");
+    
+    dispatch_group_t group = dispatch_group_create();
+    
+    // 1. 获取故事详情（高优先级）
+    dispatch_group_enter(group);
+    [self loadStoryDetailWithGroup:group];
+    
+    // 2. 获取故事类型
+    dispatch_group_enter(group);
+    [self loadStoryTypesWithGroup:group];
+    
+    // 3. 获取故事长度
+    dispatch_group_enter(group);
+    [self loadStoryLengthsWithGroup:group];
+    
+    // 所有请求完成后处理
+    dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+        NSLog(@"📡 所有数据请求完成（优先级模式）");
+        [self handleAllDataLoadingComplete];
+    });
+}
+
+/// 获取故事详情（带group）
+- (void)loadStoryDetailWithGroup:(dispatch_group_t)group {
+    [[AFStoryAPIManager sharedManager] getStoryDetailWithId:self.storyModel.storyId
+                                                     success:^(VoiceStoryModel *story) {
+        NSLog(@"✅ 获取故事详情成功: %@", story.storyName);
+        // 更新当前的故事模型为最新数据
+        self.storyModel = story;
+        dispatch_group_leave(group);
+        
+    } failure:^(NSError *error) {
+        NSLog(@"❌ 获取故事详情失败: %@", error.localizedDescription);
+        // 失败时使用原有模型
+        dispatch_group_leave(group);
+    }];
+}
+
+/// 获取故事类型（带group）
+- (void)loadStoryTypesWithGroup:(dispatch_group_t)group {
+    [[AFStoryAPIManager sharedManager] getStoryTypesSuccess:^(APIResponseModel *response) {
+        if (response.isSuccess && response.data) {
+            if ([response.data isKindOfClass:[NSArray class]]) {
+                NSArray *dataArray = (NSArray *)response.data;
+                NSMutableArray *types = [NSMutableArray array];
+                NSMutableArray *typeCodes = [NSMutableArray array];
+                
+                NSString *currentLanguage = [[NSLocale preferredLanguages] firstObject];
+                BOOL isChineseEnvironment = [currentLanguage hasPrefix:@"zh"];
+                
+                for (NSDictionary *item in dataArray) {
+                    if ([item isKindOfClass:[NSDictionary class]]) {
+                        NSString *desc = nil;
+                        NSNumber *code = item[@"code"];
+                        
+                        if (isChineseEnvironment) {
+                            desc = item[@"cnDesc"];
+                        } else {
+                            desc = item[@"enDesc"];
+                        }
+                        
+                        if (desc && desc.length > 0 && code) {
+                            [types addObject:desc];
+                            [typeCodes addObject:code];
+                        }
+                    }
+                }
+                
+                if (types.count > 0) {
+                    self.storyTypes = [types copy];
+                    self.storyTypeCodes = [typeCodes copy];
+                    NSLog(@"✅ 从API获取故事类型成功 (%@): %@", isChineseEnvironment ? @"中文" : @"英文", self.storyTypes);
+                }
+            }
+        }
+        dispatch_group_leave(group);
+    } failure:^(NSError *error) {
+        NSLog(@"❌ 获取故事类型网络错误: %@", error.localizedDescription);
+        dispatch_group_leave(group);
+    }];
+}
+
+/// 获取故事长度（带group）
+- (void)loadStoryLengthsWithGroup:(dispatch_group_t)group {
+    [[AFStoryAPIManager sharedManager] getStoryLengthsSuccess:^(APIResponseModel *response) {
+        if (response.isSuccess && response.data) {
+            if ([response.data isKindOfClass:[NSArray class]]) {
+                NSArray *dataArray = (NSArray *)response.data;
+                NSMutableArray *lengths = [NSMutableArray array];
+                NSMutableArray *lengthSeconds = [NSMutableArray array];
+                
+                NSString *currentLanguage = [[NSLocale preferredLanguages] firstObject];
+                BOOL isChineseEnvironment = [currentLanguage hasPrefix:@"zh"];
+                
+                for (NSDictionary *item in dataArray) {
+                    if ([item isKindOfClass:[NSDictionary class]]) {
+                        NSString *desc = nil;
+                        NSNumber *seconds = item[@"seconds"];
+                        
+                        if (isChineseEnvironment) {
+                            desc = item[@"durationDesc"];
+                        } else {
+                            NSInteger secondsValue = [seconds integerValue];
+                            if (secondsValue > 0) {
+                                if (secondsValue < 60) {
+                                    desc = [NSString stringWithFormat:@"%lds", (long)secondsValue];
+                                } else if (secondsValue % 60 == 0) {
+                                    desc = [NSString stringWithFormat:@"%ldmin", (long)(secondsValue / 60)];
+                                } else {
+                                    NSInteger minutes = secondsValue / 60;
+                                    NSInteger remainingSeconds = secondsValue % 60;
+                                    desc = [NSString stringWithFormat:@"%ldmin %lds", (long)minutes, (long)remainingSeconds];
+                                }
+                            }
+                        }
+                        
+                        if (desc && desc.length > 0 && seconds) {
+                            [lengths addObject:desc];
+                            [lengthSeconds addObject:seconds];
+                        }
+                    }
+                }
+                
+                if (lengths.count > 0) {
+                    self.storyLengths = [lengths copy];
+                    self.storyLengthSeconds = [lengthSeconds copy];
+                    NSLog(@"✅ 从API获取故事长度成功 (%@): %@", isChineseEnvironment ? @"中文" : @"英文", self.storyLengths);
+                }
+            }
+        }
+        dispatch_group_leave(group);
+    } failure:^(NSError *error) {
+        NSLog(@"❌ 获取故事长度网络错误: %@", error.localizedDescription);
+        dispatch_group_leave(group);
+    }];
+}
+
+/// 从API加载故事类型和时长数据
+- (void)loadStoryTypesAndLengths {
+    NSLog(@"📡 普通模式：加载故事类型和长度数据");
+    
+    dispatch_group_t group = dispatch_group_create();
+    
+    // 1. 获取故事类型
+    dispatch_group_enter(group);
+    [self loadStoryTypesWithGroup:group];
+    
+    // 2. 获取故事长度
+    dispatch_group_enter(group);
+    [self loadStoryLengthsWithGroup:group];
+    
+    // 所有请求完成后处理
+    dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+        NSLog(@"📡 所有数据请求完成（普通模式）");
+        [self handleAllDataLoadingComplete];
+    });
+}
+
+/// 处理所有数据加载完成
+- (void)handleAllDataLoadingComplete {
+    NSLog(@"🎯 所有数据加载完成，开始显示UI");
+    
+    // 更新加载文字
+    [self updateLoadingText:@"正在构建界面..."];
+    
+    // 数据加载完成后再设置UI
+    [self setupUI];
+    [self setupSpeechRecognition];
+    
+    // 如果有传入的故事模型，设置表单
+    if (self.storyModel) {
+        [self updateLoadingText:@"正在加载故事数据..."];
+        [self setupFormWithStoryModel:self.storyModel];
+    } else {
+        // 如果没有故事模型，确保隐藏失败横幅
+        [self hideFailureBanner];
+        // 延迟隐藏加载视图，确保UI完全加载完成
+        [self hideCustomLoadingView];
+    }
+}
+
+
+
+/// 设置默认故事类型
+- (void)setDefaultStoryTypes {
+    // 根据当前语言环境设置默认故事类型
+    NSString *currentLanguage = [[NSLocale preferredLanguages] firstObject];
+    BOOL isChineseEnvironment = [currentLanguage hasPrefix:@"zh"];
+    
+    if (isChineseEnvironment) {
+        self.storyTypes = @[@"童话", @"寓言", @"冒险", @"超级英雄", @"科幻", @"教育", @"睡前故事"];
+    } else {
+        self.storyTypes = @[@"Fairy Tale", @"Fable", @"Adventure", @"Superhero", @"Science Fiction", @"Educational", @"Bedtime Story"];
+    }
+    
+    // 默认的故事类型代码（按照API返回的code顺序：1-7）
+    self.storyTypeCodes = @[@1, @2, @3, @4, @5, @6, @7];
+    
+    NSLog(@"📝 使用默认故事类型: %@", self.storyTypes);
+}
+
+/// 设置默认故事长度
+- (void)setDefaultStoryLengths {
+    // 根据当前语言环境设置默认故事长度
+    NSString *currentLanguage = [[NSLocale preferredLanguages] firstObject];
+    BOOL isChineseEnvironment = [currentLanguage hasPrefix:@"zh"];
+    
+    if (isChineseEnvironment) {
+        self.storyLengths = @[@"1分钟", @"2分钟", @"3分钟"];
+    } else {
+        self.storyLengths = @[@"1min", @"2min", @"3min"];
+    }
+    
+    // 默认的故事长度秒数（按照API返回的seconds）
+    self.storyLengthSeconds = @[@60, @120, @180];
+    
+    NSLog(@"📝 使用默认故事长度: %@", self.storyLengths);
 }
 
 - (void)setupUI {
@@ -281,8 +595,8 @@
     // Story Theme
     [self setupThemeSection];
     
-    // Story Illustration
-    [self setupIllustrationSection];
+//    // Story Illustration
+//    [self setupIllustrationSection];
     
     // Story Content
     [self setupContentSection];
@@ -403,111 +717,111 @@
     }];
 }
 
-- (void)setupIllustrationSection {
-    // 白色卡片容器
-    self.illustrationCardView = [[UIView alloc] init];
-    self.illustrationCardView.backgroundColor = [UIColor whiteColor];
-    self.illustrationCardView.layer.cornerRadius = 12;
-    self.illustrationCardView.layer.masksToBounds = YES;
-    [self.contentView addSubview:self.illustrationCardView];
-    
-    [self.illustrationCardView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.themeCardView.mas_bottom).offset(24);
-        make.left.equalTo(self.contentView).offset(16);
-        make.right.equalTo(self.contentView).offset(-16);
-        make.height.mas_equalTo(138);
-    }];
-    
-    // 标题（放在卡片内部顶部）
-    self.illustrationLabel = [[UILabel alloc] init];
-    self.illustrationLabel.text = @"Story Header";
-    self.illustrationLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightMedium];
-    self.illustrationLabel.textColor = [UIColor blackColor];
-    self.illustrationLabel.numberOfLines = 0;
-    [self.illustrationCardView addSubview:self.illustrationLabel];
-    
-    [self.illustrationLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.illustrationCardView).offset(16);
-        make.left.equalTo(self.illustrationCardView).offset(16);
-        make.right.lessThanOrEqualTo(self.illustrationCardView).offset(-16);
-    }];
-    
-    // 为了确保标题有足够的高度，我们手动设置一个固定的约束
-    [self.illustrationLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    [self.illustrationLabel setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    
-    // 图片容器
-    self.imageContainerView = [[UIView alloc] init];
-    self.imageContainerView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
-    self.imageContainerView.layer.cornerRadius = 8;
-    self.imageContainerView.layer.masksToBounds = YES;
-    self.imageContainerView.userInteractionEnabled = YES;
-    [self.illustrationCardView addSubview:self.imageContainerView];
-    
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(addImageButtonTapped)];
-    [self.imageContainerView addGestureRecognizer:tapGesture];
-    
-    [self.imageContainerView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(self.illustrationCardView).offset(16);
-        make.top.equalTo(self.illustrationLabel.mas_bottom).offset(12);
-        make.width.height.mas_equalTo(76);
-        make.bottom.lessThanOrEqualTo(self.illustrationCardView).offset(-16);
-    }];
-    
-    // 添加图片图标
-    self.addImageIcon = [[UIImageView alloc] init];
-    self.addImageIcon.image = [UIImage systemImageNamed:@"plus"];
-    self.addImageIcon.tintColor = [UIColor colorWithWhite:0.6 alpha:1];
-    [self.imageContainerView addSubview:self.addImageIcon];
-    
-    [self.addImageIcon mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self.imageContainerView);
-        make.centerY.equalTo(self.imageContainerView).offset(-10);
-        make.width.height.mas_equalTo(24);
-    }];
-    
-    // 添加图片文字
-    self.addImageLabel = [[UILabel alloc] init];
-    self.addImageLabel.text = @"添加图片";
-    self.addImageLabel.font = [UIFont systemFontOfSize:12];
-    self.addImageLabel.textColor = [UIColor colorWithWhite:0.6 alpha:1];
-    self.addImageLabel.textAlignment = NSTextAlignmentCenter;
-    [self.imageContainerView addSubview:self.addImageLabel];
-    
-    [self.addImageLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self.imageContainerView);
-        make.top.equalTo(self.addImageIcon.mas_bottom).offset(4);
-    }];
-    
-    // 选中的图片视图
-    self.selectedImageView = [[UIImageView alloc] init];
-    self.selectedImageView.contentMode = UIViewContentModeScaleAspectFill;
-    self.selectedImageView.clipsToBounds = YES;
-    self.selectedImageView.hidden = YES;
-    [self.imageContainerView addSubview:self.selectedImageView];
-    
-    [self.selectedImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(self.imageContainerView);
-    }];
-    
-    // 删除按钮（X）
-    self.removeImageButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.removeImageButton.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6];
-    self.removeImageButton.layer.cornerRadius = 12;
-    [self.removeImageButton setImage:[UIImage systemImageNamed:@"xmark"] forState:UIControlStateNormal];
-    self.removeImageButton.tintColor = [UIColor whiteColor];
-    [self.removeImageButton addTarget:self action:@selector(removeImageButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    self.removeImageButton.hidden = YES;
-    // ✅ 添加到背景卡片中，避免被图层截断
-    [self.illustrationCardView addSubview:self.removeImageButton];
-    
-    [self.removeImageButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        // ✅ 相对于图片容器定位，但约束到背景卡片，避免被截断
-        make.top.equalTo(self.imageContainerView).offset(-12);
-        make.left.equalTo(self.imageContainerView.mas_right).offset(-12);
-        make.width.height.mas_equalTo(24);
-    }];
-}
+//- (void)setupIllustrationSection {
+//    // 白色卡片容器
+//    self.illustrationCardView = [[UIView alloc] init];
+//    self.illustrationCardView.backgroundColor = [UIColor whiteColor];
+//    self.illustrationCardView.layer.cornerRadius = 12;
+//    self.illustrationCardView.layer.masksToBounds = YES;
+//    [self.contentView addSubview:self.illustrationCardView];
+//    
+//    [self.illustrationCardView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.themeCardView.mas_bottom).offset(24);
+//        make.left.equalTo(self.contentView).offset(16);
+//        make.right.equalTo(self.contentView).offset(-16);
+//        make.height.mas_equalTo(138);
+//    }];
+//    
+////    // 标题（放在卡片内部顶部）
+////    self.illustrationLabel = [[UILabel alloc] init];
+////    self.illustrationLabel.text = @"Story Header";
+////    self.illustrationLabel.font = [UIFont systemFontOfSize:17 weight:UIFontWeightMedium];
+////    self.illustrationLabel.textColor = [UIColor blackColor];
+////    self.illustrationLabel.numberOfLines = 0;
+////    [self.illustrationCardView addSubview:self.illustrationLabel];
+////    
+////    [self.illustrationLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+////        make.top.equalTo(self.illustrationCardView).offset(16);
+////        make.left.equalTo(self.illustrationCardView).offset(16);
+////        make.right.lessThanOrEqualTo(self.illustrationCardView).offset(-16);
+////    }];
+////    
+////    // 为了确保标题有足够的高度，我们手动设置一个固定的约束
+////    [self.illustrationLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+////    [self.illustrationLabel setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+////    
+////    // 图片容器
+////    self.imageContainerView = [[UIView alloc] init];
+////    self.imageContainerView.backgroundColor = [UIColor colorWithWhite:0.95 alpha:1];
+////    self.imageContainerView.layer.cornerRadius = 8;
+////    self.imageContainerView.layer.masksToBounds = YES;
+////    self.imageContainerView.userInteractionEnabled = YES;
+////    [self.illustrationCardView addSubview:self.imageContainerView];
+////    
+////    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(addImageButtonTapped)];
+////    [self.imageContainerView addGestureRecognizer:tapGesture];
+////    
+////    [self.imageContainerView mas_makeConstraints:^(MASConstraintMaker *make) {
+////        make.left.equalTo(self.illustrationCardView).offset(16);
+////        make.top.equalTo(self.illustrationLabel.mas_bottom).offset(12);
+////        make.width.height.mas_equalTo(76);
+////        make.bottom.lessThanOrEqualTo(self.illustrationCardView).offset(-16);
+////    }];
+////    
+////    // 添加图片图标
+////    self.addImageIcon = [[UIImageView alloc] init];
+////    self.addImageIcon.image = [UIImage systemImageNamed:@"plus"];
+////    self.addImageIcon.tintColor = [UIColor colorWithWhite:0.6 alpha:1];
+////    [self.imageContainerView addSubview:self.addImageIcon];
+////    
+////    [self.addImageIcon mas_makeConstraints:^(MASConstraintMaker *make) {
+////        make.centerX.equalTo(self.imageContainerView);
+////        make.centerY.equalTo(self.imageContainerView).offset(-10);
+////        make.width.height.mas_equalTo(24);
+////    }];
+////    
+////    // 添加图片文字
+////    self.addImageLabel = [[UILabel alloc] init];
+////    self.addImageLabel.text = @"添加图片";
+////    self.addImageLabel.font = [UIFont systemFontOfSize:12];
+////    self.addImageLabel.textColor = [UIColor colorWithWhite:0.6 alpha:1];
+////    self.addImageLabel.textAlignment = NSTextAlignmentCenter;
+////    [self.imageContainerView addSubview:self.addImageLabel];
+////    
+////    [self.addImageLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+////        make.centerX.equalTo(self.imageContainerView);
+////        make.top.equalTo(self.addImageIcon.mas_bottom).offset(4);
+////    }];
+////    
+////    // 选中的图片视图
+////    self.selectedImageView = [[UIImageView alloc] init];
+////    self.selectedImageView.contentMode = UIViewContentModeScaleAspectFill;
+////    self.selectedImageView.clipsToBounds = YES;
+////    self.selectedImageView.hidden = YES;
+////    [self.imageContainerView addSubview:self.selectedImageView];
+////    
+////    [self.selectedImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+////        make.edges.equalTo(self.imageContainerView);
+////    }];
+////    
+////    // 删除按钮（X）
+////    self.removeImageButton = [UIButton buttonWithType:UIButtonTypeCustom];
+////    self.removeImageButton.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6];
+////    self.removeImageButton.layer.cornerRadius = 12;
+////    [self.removeImageButton setImage:[UIImage systemImageNamed:@"xmark"] forState:UIControlStateNormal];
+////    self.removeImageButton.tintColor = [UIColor whiteColor];
+////    [self.removeImageButton addTarget:self action:@selector(removeImageButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+////    self.removeImageButton.hidden = YES;
+////    // ✅ 添加到背景卡片中，避免被图层截断
+////    [self.illustrationCardView addSubview:self.removeImageButton];
+////    
+////    [self.removeImageButton mas_makeConstraints:^(MASConstraintMaker *make) {
+////        // ✅ 相对于图片容器定位，但约束到背景卡片，避免被截断
+////        make.top.equalTo(self.imageContainerView).offset(-12);
+////        make.left.equalTo(self.imageContainerView.mas_right).offset(-12);
+////        make.width.height.mas_equalTo(24);
+////    }];
+//}
 
 - (void)setupContentSection {
     // 白色卡片容器
@@ -518,10 +832,10 @@
     [self.contentView addSubview:self.contentCardView];
     
     [self.contentCardView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.illustrationCardView.mas_bottom).offset(24);
+        make.top.equalTo(self.themeCardView.mas_bottom).offset(24);
         make.left.equalTo(self.contentView).offset(16);
         make.right.equalTo(self.contentView).offset(-16);
-        make.height.mas_equalTo(180);
+        make.height.mas_equalTo(280);
     }];
     
     // 标题（放在卡片内部顶部）
@@ -792,56 +1106,56 @@
 
 #pragma mark - Actions
 
-- (void)addImageButtonTapped {
-    [self.view endEditing:YES];
-    
-    [self showIllustrationPicker];
-}
+//- (void)addImageButtonTapped {
+//    [self.view endEditing:YES];
+//    
+//    [self showIllustrationPicker];
+//}
 
-- (void)showIllustrationPicker {
-    SelectIllustrationVC *vc = [[SelectIllustrationVC alloc] init];
-    
-    // 设置当前已选择的图片URL，以便在选择器中显示选中状态
-    if (self.selectedIllustrationUrl && self.selectedIllustrationUrl.length > 0) {
-        vc.imgUrl = self.selectedIllustrationUrl;
-        NSLog(@"🖼️ 传递已选择的图片URL: %@", self.selectedIllustrationUrl);
-    }
-    
-    // 设置回调
-    vc.sureBlock = ^(NSString *imgUrl) {
-        NSLog(@"选中的插画: %@", imgUrl);
-        
-        // 保存选中的插画URL
-        self.selectedIllustrationUrl = imgUrl;
-        
-        // 使用插画URL设置按钮背景
-        [self.selectedImageView sd_setImageWithURL:[NSURL URLWithString:imgUrl]
-                                  placeholderImage:nil
-                                           options:SDWebImageRefreshCached
-                                         completed:nil];
-        self.selectedImageView.hidden = NO;
-        self.removeImageButton.hidden = NO;
-        self.addImageIcon.hidden = YES;
-        self.addImageLabel.hidden = YES;
-        NSLog(@"✅ 插画已选中，URL已保存");
-    };
-    
-    // 显示
-    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [self presentViewController:vc animated:NO completion:^{
-        [vc showView];
-    }];
-}
+//- (void)showIllustrationPicker {
+//    SelectIllustrationVC *vc = [[SelectIllustrationVC alloc] init];
+//    
+//    // 设置当前已选择的图片URL，以便在选择器中显示选中状态
+//    if (self.selectedIllustrationUrl && self.selectedIllustrationUrl.length > 0) {
+//        vc.imgUrl = self.selectedIllustrationUrl;
+//        NSLog(@"🖼️ 传递已选择的图片URL: %@", self.selectedIllustrationUrl);
+//    }
+//    
+//    // 设置回调
+//    vc.sureBlock = ^(NSString *imgUrl) {
+//        NSLog(@"选中的插画: %@", imgUrl);
+//        
+//        // 保存选中的插画URL
+//        self.selectedIllustrationUrl = imgUrl;
+//        
+////        // 使用插画URL设置按钮背景
+////        [self.selectedImageView sd_setImageWithURL:[NSURL URLWithString:imgUrl]
+////                                  placeholderImage:nil
+////                                           options:SDWebImageRefreshCached
+////                                         completed:nil];
+////        self.selectedImageView.hidden = NO;
+////        self.removeImageButton.hidden = NO;
+////        self.addImageIcon.hidden = YES;
+////        self.addImageLabel.hidden = YES;
+//        NSLog(@"✅ 插画已选中，URL已保存");
+//    };
+//    
+//    // 显示
+//    vc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+//    [self presentViewController:vc animated:NO completion:^{
+//        [vc showView];
+//    }];
+//}
 
-- (void)removeImageButtonTapped {
-    self.selectedImage = nil;
-    self.selectedIllustrationUrl = nil;
-    self.selectedImageView.image = nil;
-    self.selectedImageView.hidden = YES;
-    self.removeImageButton.hidden = YES;
-    self.addImageIcon.hidden = NO;
-    self.addImageLabel.hidden = NO;
-}
+//- (void)removeImageButtonTapped {
+//    self.selectedImage = nil;
+//    self.selectedIllustrationUrl = nil;
+//    self.selectedImageView.image = nil;
+//    self.selectedImageView.hidden = YES;
+//    self.removeImageButton.hidden = YES;
+//    self.addImageIcon.hidden = NO;
+//    self.addImageLabel.hidden = NO;
+//}
 
 - (void)showImagePicker {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
@@ -977,6 +1291,12 @@
 - (void)typeButtonTapped {
     [self.view endEditing:YES];
     
+    // 检查数据是否已加载
+    if (!self.storyTypes || self.storyTypes.count == 0) {
+        [self showErrorAlert:@"故事类型数据加载中，请稍后重试"];
+        return;
+    }
+    
     BottomPickerView *picker = [[BottomPickerView alloc] initWithTitle:@"请选择故事类型"
                                                                 options:self.storyTypes
                                                           selectedIndex:self.selectedTypeIndex
@@ -991,6 +1311,12 @@
 
 - (void)lengthButtonTapped {
     [self.view endEditing:YES];
+    
+    // 检查数据是否已加载
+    if (!self.storyLengths || self.storyLengths.count == 0) {
+        [self showErrorAlert:@"故事长度数据加载中，请稍后重试"];
+        return;
+    }
     
     BottomPickerView *picker = [[BottomPickerView alloc] initWithTitle:@"请选择故事时长"
                                                                 options:self.storyLengths
@@ -1018,8 +1344,14 @@
         return;
     }
     
-    // 创建故事请求
-    [self createStoryRequest];
+    // 根据是否有故事模型来决定调用创建或编辑接口
+    if (self.storyModel) {
+        // 编辑模式：调用编辑故事接口
+        [self updateStoryRequest];
+    } else {
+        // 创建模式：调用创建故事接口
+        [self createStoryRequest];
+    }
 }
 
 - (NSString *)validateInputs {
@@ -1031,10 +1363,10 @@
         return @"故事名称不超过120字符";
     }
     
-    // 验证插图
-    if (!self.selectedImage && !self.selectedIllustrationUrl) {
-        return @"请选择故事插图";
-    }
+//    // 验证插图
+//    if (!self.selectedImage && !self.selectedIllustrationUrl) {
+//        return @"请选择故事插图";
+//    }
     
     // 验证故事内容
     if (self.contentTextView.text.length == 0) {
@@ -1070,9 +1402,26 @@
     [self showLoadingAlert];
     
     // 转换参数
-    NSArray *lengthValues = @[@90, @180, @270, @360];
-    NSInteger storyLength = [lengthValues[self.selectedLengthIndex] integerValue];
-    StoryType storyType = (StoryType)(self.selectedTypeIndex + 1);
+    // 获取选中的故事长度（秒数）
+    NSInteger storyLength = 60; // 默认值
+    if (self.selectedLengthIndex >= 0 && self.selectedLengthIndex < self.storyLengthSeconds.count) {
+        storyLength = [self.storyLengthSeconds[self.selectedLengthIndex] integerValue];
+    } else {
+        // 兼容性处理：如果没有seconds映射，使用原来的逻辑
+        NSArray *lengthValues = @[@90, @180, @270, @360];
+        if (self.selectedLengthIndex >= 0 && self.selectedLengthIndex < lengthValues.count) {
+            storyLength = [lengthValues[self.selectedLengthIndex] integerValue];
+        }
+    }
+    
+    // 获取选中的故事类型code
+    StoryType storyType = 1; // 默认值
+    if (self.selectedTypeIndex >= 0 && self.selectedTypeIndex < self.storyTypeCodes.count) {
+        storyType = (StoryType)[self.storyTypeCodes[self.selectedTypeIndex] integerValue];
+    } else {
+        // 兼容性处理：如果没有codes映射，使用原来的逻辑
+        storyType = (StoryType)(self.selectedTypeIndex + 1);
+    }
     
     // 创建请求模型
     CreateStoryRequestModel *request = [[CreateStoryRequestModel alloc]
@@ -1081,7 +1430,7 @@
                 type:storyType
       protagonistName:self.protagonistTextField.text
               length:storyLength
-      illustrationUrl:self.selectedIllustrationUrl ?: @"/illustration/001.png"];
+      illustrationUrl:self.selectedIllustrationUrl ?: @""];
     
      //验证请求模型
     if (![request isValid]) {
@@ -1116,6 +1465,236 @@
 //        [strongSelf showErrorAlert:error.localizedDescription];
     }];
 }
+
+- (void)updateStoryRequest {
+    // 显示加载提示
+    [self showUpdateLoadingAlert];
+    
+    // 检查故事状态是否为失败状态
+    BOOL isFailedStory = [self isStoryModelInFailedState:self.storyModel];
+    
+    if (isFailedStory) {
+        // 失败状态的故事：调用更新失败故事接口，可以修改所有字段
+        [self updateFailedStoryRequest];
+    } else {
+        // 正常状态的故事：检查是否修改了无法通过普通更新API修改的字段
+        if ([self hasUnsupportedChanges]) {
+            [self hideLoadingAlert];
+            [self showRecreateStoryConfirmation];
+            return;
+        }
+        
+        // 调用普通更新接口，只能修改部分字段
+//        [self normalUpdateStoryRequest];
+    }
+}
+
+/// 普通故事更新（原有的逻辑）
+//- (void)normalUpdateStoryRequest {
+//    // 创建编辑请求模型，基于现有的 storyId
+//    UpdateStoryRequestModel *request = [[UpdateStoryRequestModel alloc] initWithStoryId:self.storyModel.storyId];
+//    
+//    // 设置更新字段
+//    request.storyName = self.themeTextView.text;
+//    request.storyContent = self.contentTextView.text; // 注意：UpdateStoryRequestModel 使用的是 storyContent，不是 storySummary
+//    request.illustrationUrl = self.selectedIllustrationUrl?:@"";
+//    
+//    NSLog(@"🔄 准备更新故事 ID: %ld", (long)self.storyModel.storyId);
+//    NSLog(@"📝 更新内容: 名称=%@, 内容长度=%ld, 插图=%@", 
+//          request.storyName, (long)request.storyContent.length, request.illustrationUrl);
+//    
+//    // 调用编辑API
+//    __weak typeof(self) weakSelf = self;
+//    [[AFStoryAPIManager sharedManager] updateStory:request
+//                                           success:^(APIResponseModel *response) {
+//        __strong typeof(weakSelf) strongSelf = weakSelf;
+//        if (!strongSelf) return;
+//        
+//        [strongSelf hideLoadingAlert];
+//        
+//        if (response.isSuccess) {
+//            NSLog(@"✅ 故事编辑成功");
+//            [strongSelf handleUpdateStorySuccess:response];
+//        } else {
+//            NSLog(@"❌ 故事编辑失败: %@", response.errorMessage);
+//            [strongSelf showErrorAlert:response.errorMessage];
+//        }
+//        
+//    } failure:^(NSError *error) {
+//        __strong typeof(weakSelf) strongSelf = weakSelf;
+//        if (!strongSelf) return;
+//        
+//        [strongSelf hideLoadingAlert];
+//        NSLog(@"❌ 网络请求失败: %@", error.localizedDescription);
+//        [strongSelf showErrorAlert:error.localizedDescription];
+//    }];
+//}
+
+/// 失败故事更新（调用新的update_fail接口）
+- (void)updateFailedStoryRequest {
+    // 获取选中的故事长度（秒数）
+    NSInteger storyLength = 60; // 默认值
+    if (self.selectedLengthIndex >= 0 && self.selectedLengthIndex < self.storyLengthSeconds.count) {
+        storyLength = [self.storyLengthSeconds[self.selectedLengthIndex] integerValue];
+    } else {
+        // 兼容性处理：如果没有seconds映射，使用原来的逻辑
+        NSArray *lengthValues = @[@90, @180, @270, @360];
+        if (self.selectedLengthIndex >= 0 && self.selectedLengthIndex < lengthValues.count) {
+            storyLength = [lengthValues[self.selectedLengthIndex] integerValue];
+        }
+    }
+    
+    // 获取选中的故事类型code
+    StoryType storyType = 1; // 默认值
+    if (self.selectedTypeIndex >= 0 && self.selectedTypeIndex < self.storyTypeCodes.count) {
+        storyType = (StoryType)[self.storyTypeCodes[self.selectedTypeIndex] integerValue];
+    } else {
+        // 兼容性处理：如果没有codes映射，使用原来的逻辑
+        storyType = (StoryType)(self.selectedTypeIndex + 1);
+    }
+    
+    // 获取当前familyId
+    NSInteger currentFamilyId = [[CoreArchive strForKey:KCURRENT_HOME_ID] integerValue];
+    
+    // 创建失败故事更新请求模型
+    UpdateFailedStoryRequestModel *request = [[UpdateFailedStoryRequestModel alloc] 
+        initWithStoryId:self.storyModel.storyId
+               familyId:currentFamilyId
+              storyName:self.themeTextView.text
+           storySummary:self.contentTextView.text
+              storyType:storyType
+         protagonistName:self.protagonistTextField.text
+            storyLength:storyLength];
+    
+    // 验证请求参数
+    if (![request isValid]) {
+        [self hideLoadingAlert];
+        [self showErrorAlert:[request validationError]];
+        return;
+    }
+    
+    NSLog(@"🔄 调用失败故事更新接口 ID: %ld", (long)self.storyModel.storyId);
+    NSLog(@"📝 更新参数: %@", [request toDictionary]);
+    
+    // 调用失败故事更新API
+    __weak typeof(self) weakSelf = self;
+    [[AFStoryAPIManager sharedManager] updateFailedStory:request
+                                                 success:^(APIResponseModel *response) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        [strongSelf hideLoadingAlert];
+        
+        if (response.isSuccess) {
+            NSLog(@"✅ 失败故事更新成功");
+            [strongSelf handleUpdateStorySuccess:response];
+        } else {
+            NSLog(@"❌ 失败故事更新失败: %@", response.errorMessage);
+            [strongSelf showErrorAlert:response.errorMessage];
+        }
+        
+    } failure:^(NSError *error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        [strongSelf hideLoadingAlert];
+        NSLog(@"❌ 失败故事更新网络请求失败: %@", error.localizedDescription);
+        [strongSelf showErrorAlert:error.localizedDescription];
+    }];
+}
+
+/// 检查是否修改了无法通过更新API修改的字段
+- (BOOL)hasUnsupportedChanges {
+    // 检查故事类型是否改变
+    if (self.selectedTypeIndex >= 0) {
+        NSInteger selectedTypeCode = 0;
+        if (self.selectedTypeIndex < self.storyTypeCodes.count) {
+            selectedTypeCode = [self.storyTypeCodes[self.selectedTypeIndex] integerValue];
+        } else {
+            // 兼容性处理
+            selectedTypeCode = self.selectedTypeIndex + 1;
+        }
+        
+        if (selectedTypeCode != self.storyModel.storyType) {
+            return YES;
+        }
+    }
+    
+    // 检查主角名称是否改变
+    if (![self.protagonistTextField.text isEqualToString:self.storyModel.protagonistName ?: @""]) {
+        return YES;
+    }
+    
+    // 检查故事长度是否改变
+    if (self.selectedLengthIndex >= 0) {
+        NSInteger selectedLengthSeconds = 0;
+        if (self.selectedLengthIndex < self.storyLengthSeconds.count) {
+            selectedLengthSeconds = [self.storyLengthSeconds[self.selectedLengthIndex] integerValue];
+        } else {
+            // 兼容性处理
+            NSArray *lengthValues = @[@90, @180, @270, @360];
+            if (self.selectedLengthIndex < lengthValues.count) {
+                selectedLengthSeconds = [lengthValues[self.selectedLengthIndex] integerValue];
+            }
+        }
+        
+        if (selectedLengthSeconds != self.storyModel.storyLength) {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
+/// 显示重新创建故事的确认对话框
+- (void)showRecreateStoryConfirmation {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"需要重新生成故事"
+                                                                   message:@"您修改了故事类型、主角名称或时长，这需要重新生成故事。是否继续？"
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"取消"
+                                              style:UIAlertActionStyleCancel
+                                            handler:nil]];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"重新生成"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction * _Nonnull action) {
+        [self recreateStoryRequest];
+    }]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+/// 重新创建故事（删除旧故事并创建新故事）
+- (void)recreateStoryRequest {
+    [self showLoadingAlert];
+    
+    // 先删除现有故事
+    __weak typeof(self) weakSelf = self;
+    [[AFStoryAPIManager sharedManager] deleteStoryWithId:self.storyModel.storyId
+                                                 success:^(APIResponseModel *response) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        if (response.isSuccess) {
+            NSLog(@"✅ 旧故事删除成功，开始创建新故事");
+            // 删除成功后，创建新故事
+            [strongSelf createStoryRequest];
+        } else {
+            [strongSelf hideLoadingAlert];
+            NSLog(@"❌ 删除旧故事失败: %@", response.errorMessage);
+            [strongSelf showErrorAlert:@"删除旧故事失败，无法重新生成"];
+        }
+        
+    } failure:^(NSError *error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        
+        [strongSelf hideLoadingAlert];
+        NSLog(@"❌ 删除旧故事网络请求失败: %@", error.localizedDescription);
+        [strongSelf showErrorAlert:@"网络错误，无法重新生成故事"];
+    }];
+}
 - (void)handleCreateStorySuccess:(APIResponseModel *)response {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"创建成功"
                                                                    message:@"故事已开始生成，可在故事列表中查看"
@@ -1130,9 +1709,41 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 
+- (void)handleUpdateStorySuccess:(APIResponseModel *)response {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"保存成功"
+                                                                   message:@"故事已重新生成，可在故事列表中查看"
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"查看故事"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction * _Nonnull action) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 - (void)showLoadingAlert {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
                                                                    message:@"正在创建故事...\n\n"
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+    indicator.translatesAutoresizingMaskIntoConstraints = NO;
+    [alert.view addSubview:indicator];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [indicator.centerXAnchor constraintEqualToAnchor:alert.view.centerXAnchor],
+        [indicator.bottomAnchor constraintEqualToAnchor:alert.view.bottomAnchor constant:-20]
+    ]];
+    
+    [indicator startAnimating];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)showUpdateLoadingAlert {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
+                                                                   message:@"正在保存故事...\n\n"
                                                             preferredStyle:UIAlertControllerStyleAlert];
     
     UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
@@ -1165,23 +1776,8 @@
     
     [self presentViewController:alert animated:YES completion:nil];
 }
-#pragma mark - UIImagePickerControllerDelegate
 
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
-    UIImage *image = info[UIImagePickerControllerOriginalImage];
-    self.selectedImage = image;
-    self.selectedImageView.image = image;
-    self.selectedImageView.hidden = NO;
-    self.removeImageButton.hidden = NO;
-    self.addImageIcon.hidden = YES;
-    self.addImageLabel.hidden = YES;
-    
-    [picker dismissViewControllerAnimated:YES completion:nil];
-}
 
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [picker dismissViewControllerAnimated:YES completion:nil];
-}
 
 #pragma mark - UITextViewDelegate
 
@@ -1300,25 +1896,48 @@
     }
     
     // 4. 设置故事类型
-    if (storyModel.storyType > 0 && storyModel.storyType <= self.storyTypes.count) {
-        self.selectedTypeIndex = storyModel.storyType - 1; // 转换为数组索引
-        self.typeValueLabel.text = self.storyTypes[self.selectedTypeIndex];
-        self.typeValueLabel.textColor = [UIColor blackColor]; // 设置选中后的颜色
-        NSLog(@"✅ 设置故事类型: %@ (索引: %ld)", self.storyTypes[self.selectedTypeIndex], (long)self.selectedTypeIndex);
+    if (storyModel.storyType > 0) {
+        // 根据故事类型的code查找对应的数组索引
+        NSInteger typeIndex = -1;
+        if (self.storyTypeCodes && self.storyTypeCodes.count > 0) {
+            for (NSInteger i = 0; i < self.storyTypeCodes.count; i++) {
+                if ([self.storyTypeCodes[i] integerValue] == storyModel.storyType) {
+                    typeIndex = i;
+                    break;
+                }
+            }
+        } else {
+            // 如果没有codes映射，使用原来的逻辑（兼容性处理）
+            typeIndex = storyModel.storyType - 1;
+        }
+        
+        if (typeIndex >= 0 && typeIndex < self.storyTypes.count) {
+            self.selectedTypeIndex = typeIndex;
+            self.typeValueLabel.text = self.storyTypes[self.selectedTypeIndex];
+            self.typeValueLabel.textColor = [UIColor blackColor]; // 设置选中后的颜色
+            NSLog(@"✅ 设置故事类型: %@ (索引: %ld, code: %ld)", self.storyTypes[self.selectedTypeIndex], (long)self.selectedTypeIndex, (long)storyModel.storyType);
+        } else {
+            NSLog(@"⚠️ 未找到匹配的故事类型，code: %ld", (long)storyModel.storyType);
+        }
     }
     
     // 5. 设置故事长度（根据 storyLength 匹配）
     [self setStoryLengthFromModel:storyModel.storyLength];
     
-    // 6. 设置插图
-    if (storyModel.illustrationUrl && storyModel.illustrationUrl.length > 0) {
-        [self setIllustrationFromURL:storyModel.illustrationUrl];
-    }
+//    // 6. 设置插图
+//    if (storyModel.illustrationUrl && storyModel.illustrationUrl.length > 0) {
+//        [self setIllustrationFromURL:storyModel.illustrationUrl];
+//    }
     
     // 7. 更新导航栏标题，表明这是编辑模式
     self.title = @"Edit Story";
     
+    // 8. 更新按钮标题为编辑模式
+    [self.nextButton setTitle:@"Save Changes" forState:UIControlStateNormal];
+    
     NSLog(@"🎯 表单字段设置完成");
+    
+    [self hideCustomLoadingView];
 }
 
 #pragma mark - Failure Banner Methods
@@ -1353,43 +1972,55 @@
 
 /// 根据故事长度设置对应的选项
 - (void)setStoryLengthFromModel:(NSInteger)storyLength {
-    // 故事长度映射：90s=1min30s, 180s=3min, 270s=4.5min, 360s=6min
-    NSArray *lengthValues = @[@(90), @(180), @(270), @(360)]; // 对应的秒数
-    
-    for (NSInteger i = 0; i < lengthValues.count; i++) {
-        if ([lengthValues[i] integerValue] == storyLength) {
-            self.selectedLengthIndex = i;
-            self.lengthValueLabel.text = self.storyLengths[i];
-            self.lengthValueLabel.textColor = [UIColor blackColor]; // 设置选中后的颜色
-            NSLog(@"✅ 设置故事长度: %@ (索引: %ld, 原始值: %lds)", self.storyLengths[i], (long)i, (long)storyLength);
-            return;
+    // 根据storyLength（秒数）在storyLengthSeconds数组中查找对应索引
+    if (self.storyLengthSeconds && self.storyLengthSeconds.count > 0) {
+        for (NSInteger i = 0; i < self.storyLengthSeconds.count && i < self.storyLengths.count; i++) {
+            if ([self.storyLengthSeconds[i] integerValue] == storyLength) {
+                self.selectedLengthIndex = i;
+                self.lengthValueLabel.text = self.storyLengths[i];
+                self.lengthValueLabel.textColor = [UIColor blackColor];
+                NSLog(@"✅ 设置故事长度: %@ (索引: %ld, 秒数: %lds)", self.storyLengths[i], (long)i, (long)storyLength);
+                return;
+            }
+        }
+    } else {
+        // 兼容性处理：如果没有seconds映射，使用原来的逻辑
+        NSArray *lengthValues = @[@(90), @(180), @(270), @(360)];
+        for (NSInteger i = 0; i < lengthValues.count && i < self.storyLengths.count; i++) {
+            if ([lengthValues[i] integerValue] == storyLength) {
+                self.selectedLengthIndex = i;
+                self.lengthValueLabel.text = self.storyLengths[i];
+                self.lengthValueLabel.textColor = [UIColor blackColor];
+                NSLog(@"✅ 设置故事长度（兼容模式): %@ (索引: %ld, 原始值: %lds)", self.storyLengths[i], (long)i, (long)storyLength);
+                return;
+            }
         }
     }
     
-    // 如果没有匹配的长度，设置为默认值
-    NSLog(@"⚠️ 未找到匹配的故事长度: %lds，使用默认值", (long)storyLength);
+    // 如果没有匹配的长度，记录警告
+    NSLog(@"⚠️ 未找到匹配的故事长度: %lds", (long)storyLength);
 }
 
-/// 从URL设置插图
-- (void)setIllustrationFromURL:(NSString *)illustrationUrl {
-    self.selectedIllustrationUrl = illustrationUrl;
-    
-    // 显示网络图片
-    [self.selectedImageView sd_setImageWithURL:[NSURL URLWithString:illustrationUrl]
-                              placeholderImage:[UIImage imageNamed:@"placeholder_image"]
-                                     completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
-        if (image) {
-            // 成功加载图片，更新 UI
-            self.selectedImageView.hidden = NO;
-            self.removeImageButton.hidden = NO;
-            self.addImageLabel.hidden = YES;
-            self.addImageIcon.hidden = YES;
-            NSLog(@"✅ 设置插图: %@", illustrationUrl);
-        } else {
-            NSLog(@"⚠️ 插图加载失败: %@, 错误: %@", illustrationUrl, error.localizedDescription);
-        }
-    }];
-}
+///// 从URL设置插图
+//- (void)setIllustrationFromURL:(NSString *)illustrationUrl {
+//    self.selectedIllustrationUrl = illustrationUrl;
+//    
+//    // 显示网络图片
+//    [self.selectedImageView sd_setImageWithURL:[NSURL URLWithString:illustrationUrl]
+//                              placeholderImage:[UIImage imageNamed:@"placeholder_image"]
+//                                     completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+//        if (image) {
+//            // 成功加载图片，更新 UI
+//            self.selectedImageView.hidden = NO;
+//            self.removeImageButton.hidden = NO;
+//            self.addImageLabel.hidden = YES;
+//            self.addImageIcon.hidden = YES;
+//            NSLog(@"✅ 设置插图: %@", illustrationUrl);
+//        } else {
+//            NSLog(@"⚠️ 插图加载失败: %@, 错误: %@", illustrationUrl, error.localizedDescription);
+//        }
+//    }];
+//}
 
 /// 更新内容字数统计
 - (void)updateContentCharCount {

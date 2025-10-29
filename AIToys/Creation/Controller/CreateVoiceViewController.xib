@@ -155,20 +155,21 @@
                             </userDefinedRuntimeAttributes>
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UzG-zK-eom">
-                            <rect key="frame" x="148.66666666666666" y="314" width="64" height="64"/>
+                            <rect key="frame" x="148.66666666666666" y="310" width="64" height="64"/>
                             <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                             <state key="normal" image="create_voiceclone"/>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="按住开始录音" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Etf-d4-Cjj">
-                            <rect key="frame" x="130" y="394" width="101.33333333333331" height="21"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <rect key="frame" x="138.66666666666666" y="390" width="84" height="20"/>
+                            <fontDescription key="fontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="14"/>
                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.49502090669999999" colorSpace="custom" customColorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="声音处理.gif" translatesAutoresizingMaskIntoConstraints="NO" id="8Ch-bC-hAE">
-                            <rect key="frame" x="16" y="286" width="329" height="98"/>
+                            <rect key="frame" x="108.66666666666669" y="230" width="144" height="144"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="98" id="PUS-9W-NDB"/>
+                                <constraint firstAttribute="height" constant="144" id="PUS-9W-NDB"/>
+                                <constraint firstAttribute="width" constant="144" id="Ys5-yb-q8k"/>
                             </constraints>
                         </imageView>
                     </subviews>
@@ -176,24 +177,23 @@
                     <constraints>
                         <constraint firstItem="8Ch-bC-hAE" firstAttribute="centerX" secondItem="Xoj-s8-At4" secondAttribute="centerX" id="AUu-DH-wpV"/>
                         <constraint firstAttribute="trailing" secondItem="BYH-t1-vku" secondAttribute="trailing" constant="16" id="L8L-EK-oih"/>
+                        <constraint firstAttribute="bottom" secondItem="Etf-d4-Cjj" secondAttribute="bottom" constant="32" id="PZh-JH-GjI"/>
                         <constraint firstItem="BYH-t1-vku" firstAttribute="top" secondItem="pST-P0-9yE" secondAttribute="bottom" constant="10" id="QuR-Yn-6uR"/>
                         <constraint firstAttribute="trailing" secondItem="BYH-t1-vku" secondAttribute="trailing" constant="16" id="TCg-4d-sCn"/>
                         <constraint firstAttribute="trailing" secondItem="JWu-Un-hmE" secondAttribute="trailing" constant="16" id="UBv-AO-QFx"/>
-                        <constraint firstItem="8Ch-bC-hAE" firstAttribute="leading" secondItem="Xoj-s8-At4" secondAttribute="leading" constant="16" id="VsL-SZ-sMw"/>
                         <constraint firstItem="PAO-by-fEB" firstAttribute="leading" secondItem="Xoj-s8-At4" secondAttribute="leading" constant="16" id="WuI-ru-9vc"/>
-                        <constraint firstAttribute="bottom" secondItem="UzG-zK-eom" secondAttribute="bottom" constant="64" id="ZSf-8J-jcA"/>
-                        <constraint firstItem="Etf-d4-Cjj" firstAttribute="top" secondItem="8Ch-bC-hAE" secondAttribute="bottom" constant="10" id="Zj0-Q9-d49"/>
-                        <constraint firstItem="Etf-d4-Cjj" firstAttribute="centerX" secondItem="Xoj-s8-At4" secondAttribute="centerX" id="d2H-6g-gLN"/>
-                        <constraint firstItem="Etf-d4-Cjj" firstAttribute="top" secondItem="UzG-zK-eom" secondAttribute="bottom" constant="16" id="dHe-1p-hJO"/>
-                        <constraint firstAttribute="trailing" secondItem="8Ch-bC-hAE" secondAttribute="trailing" constant="16" id="dIc-Uj-16f"/>
+                        <constraint firstAttribute="bottom" secondItem="UzG-zK-eom" secondAttribute="bottom" constant="68" id="ZSf-8J-jcA"/>
                         <constraint firstItem="JWu-Un-hmE" firstAttribute="top" secondItem="BYH-t1-vku" secondAttribute="bottom" constant="10" id="fao-le-vdD"/>
+                        <constraint firstItem="Etf-d4-Cjj" firstAttribute="top" secondItem="8Ch-bC-hAE" secondAttribute="bottom" constant="16" id="fhl-rs-lKy"/>
                         <constraint firstItem="JWu-Un-hmE" firstAttribute="leading" secondItem="BYH-t1-vku" secondAttribute="leading" id="inb-W3-U0Q"/>
                         <constraint firstItem="UzG-zK-eom" firstAttribute="centerX" secondItem="Xoj-s8-At4" secondAttribute="centerX" id="lYI-pa-76x"/>
                         <constraint firstItem="BYH-t1-vku" firstAttribute="top" secondItem="pST-P0-9yE" secondAttribute="bottom" constant="10" id="lya-Yo-6UK"/>
                         <constraint firstItem="pST-P0-9yE" firstAttribute="centerY" secondItem="PAO-by-fEB" secondAttribute="centerY" id="ou2-VM-mCE"/>
                         <constraint firstItem="BYH-t1-vku" firstAttribute="leading" secondItem="PAO-by-fEB" secondAttribute="leading" id="pVk-K9-b1B"/>
                         <constraint firstItem="pST-P0-9yE" firstAttribute="leading" secondItem="PAO-by-fEB" secondAttribute="trailing" constant="4" id="t7l-9H-yWX"/>
+                        <constraint firstItem="Etf-d4-Cjj" firstAttribute="top" secondItem="UzG-zK-eom" secondAttribute="bottom" constant="16" id="uXU-Jy-cnJ"/>
                         <constraint firstItem="PAO-by-fEB" firstAttribute="top" secondItem="Xoj-s8-At4" secondAttribute="top" constant="16" id="vJN-dY-1EL"/>
+                        <constraint firstItem="Etf-d4-Cjj" firstAttribute="centerX" secondItem="Xoj-s8-At4" secondAttribute="centerX" id="wQA-Pc-aEQ"/>
                     </constraints>
                     <userDefinedRuntimeAttributes>
                         <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">

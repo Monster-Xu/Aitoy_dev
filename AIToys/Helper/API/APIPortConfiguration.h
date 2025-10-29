@@ -77,11 +77,20 @@ NS_ASSUME_NONNULL_BEGIN
 /// 编辑故事
 + (NSString *)getUpdateStoryUrl;
 
+/// 编辑失败的故事（重新生成）
++ (NSString *)getUpdateFailedStoryUrl;
+
 /// 删除故事
 + (NSString *)getDeleteStoryUrl;
 
 /// 故事音频合成
 + (NSString *)getSynthesizeStoryUrl;
+
+/// 查询故事类型枚举
++ (NSString *)getStoryTypesUrl;
+
+/// 查询故事长度枚举
++ (NSString *)getStoryLengthsUrl;
 
 #pragma mark - 声音相关接口
 

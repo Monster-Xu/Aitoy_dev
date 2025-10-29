@@ -19,6 +19,7 @@
         _storyLength = 180;
         _isNew = NO;
         _isPlaying = NO;
+        _isLoading = NO;  // 初始化加载状态
     }
     return self;
 }

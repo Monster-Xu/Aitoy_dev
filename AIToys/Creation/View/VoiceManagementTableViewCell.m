@@ -14,6 +14,10 @@
 // 数据
 @property (nonatomic, strong) VoiceModel *voiceModel;
 
+// ✅ 编辑模式状态
+@property (nonatomic, assign) BOOL isEditingMode;
+@property (nonatomic, assign) BOOL isSelected;
+
 @end
 
 @implementation VoiceManagementTableViewCell
@@ -48,6 +52,17 @@
     if (self.playButton) {
         [self.playButton addTarget:self action:@selector(playButtonAction:) forControlEvents:UIControlEventTouchUpInside];
     }
+    
+    // ✅ 设置选择按钮
+    if (self.chooseButton) {
+        [self.chooseButton addTarget:self action:@selector(chooseButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+        // 初始状态隐藏选择按钮
+        self.chooseButton.hidden = YES;
+    }
+    
+    // ✅ 初始化编辑模式状态
+    self.isEditingMode = NO;
+    self.isSelected = NO;
 }
 
 #pragma mark - 数据绑定
@@ -164,6 +179,12 @@
     self.playButton.selected = NO; // ✅ 重置selected状态
     [self.playButton setImage:[UIImage imageNamed:@"create_play"] forState:UIControlStateNormal];
     self.playButton.tintColor = [UIColor lightGrayColor];
+    
+    // ✅ 重置选择按钮
+    if (self.chooseButton) {
+        self.chooseButton.hidden = !self.isEditingMode;
+        [self updateChooseButtonState];
+    }
 }
 
 /// 配置克隆失败状态
@@ -228,6 +249,20 @@
     
     // ✅ 隐藏statusView
     self.statusView.hidden = YES;
+    
+    // ✅ 编辑模式下隐藏编辑和播放按钮，显示选择按钮
+    if (self.isEditingMode) {
+        self.editButton.hidden = YES;
+        self.playButton.hidden = YES;
+        self.chooseButton.hidden = NO;
+        [self updateChooseButtonState];
+        return;
+    }
+    
+    // ✅ 正常模式下显示编辑和播放按钮，隐藏选择按钮
+    self.editButton.hidden = NO;
+    self.playButton.hidden = NO;
+    self.chooseButton.hidden = YES;
     
     // 根据具体状态配置按钮
     switch (voice.cloneStatus) {
@@ -334,6 +369,64 @@
     }
 }
 
+#pragma mark - ✅ 编辑模式管理
+
+/// 更新编辑模式状态
+- (void)updateEditingMode:(BOOL)isEditingMode isSelected:(BOOL)isSelected {
+    self.isEditingMode = isEditingMode;
+    self.isSelected = isSelected;
+    
+    NSLog(@"📝 Cell编辑模式状态更新 - 编辑模式: %@, 选中状态: %@", 
+          isEditingMode ? @"是" : @"否", isSelected ? @"是" : @"否");
+    
+    // 更新按钮显示状态
+    if (isEditingMode) {
+        // 编辑模式：隐藏编辑和播放按钮，显示选择按钮
+        self.editButton.hidden = YES;
+        self.playButton.hidden = YES;
+        self.chooseButton.hidden = NO;
+    } else {
+        // 正常模式：显示编辑和播放按钮，隐藏选择按钮
+        self.editButton.hidden = NO;
+        self.playButton.hidden = NO;
+        self.chooseButton.hidden = YES;
+    }
+    
+    // 更新选择按钮状态
+    [self updateChooseButtonState];
+    
+    // 如果退出编辑模式且有音色数据，重新配置按钮状态
+    if (!isEditingMode && self.voiceModel) {
+        [self updateUIForVoiceStatus:self.voiceModel];
+    }
+}
+
+/// 更新选择按钮的图片状态
+- (void)updateChooseButtonState {
+    if (!self.chooseButton) {
+        return;
+    }
+    
+    if (self.isSelected) {
+        // 选中状态：显示choose_sel图片
+        [self.chooseButton setImage:[UIImage imageNamed:@"choose_sel"] forState:UIControlStateNormal];
+        NSLog(@"✅ 选择按钮状态: 已选中");
+    } else {
+        // 未选中状态：显示choose_normal图片
+        [self.chooseButton setImage:[UIImage imageNamed:@"choose_normal"] forState:UIControlStateNormal];
+        NSLog(@"⭕ 选择按钮状态: 未选中");
+    }
+}
+
+/// 选择按钮点击事件
+- (void)chooseButtonAction:(UIButton *)sender {
+    NSLog(@"✅ 选择按钮被点击 - 音色: %@, 当前状态: %@", 
+          self.voiceModel.voiceName, self.isSelected ? @"已选中" : @"未选中");
+    
+    // 选择按钮的点击会通过tableView的didSelectRowAtIndexPath处理
+    // 这里不需要额外处理，点击会自动触发cell的选中/取消选中
+}
+
 #pragma mark - 重用准备
 
 /// 准备重用时重置状态
@@ -349,6 +442,10 @@
     
     // 重置数据
     self.voiceModel = nil;
+    
+    // ✅ 重置编辑模式状态
+    self.isEditingMode = NO;
+    self.isSelected = NO;
     
     // 重置UI状态
     [self resetButtonsState];

@@ -19,7 +19,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="默认头像" translatesAutoresizingMaskIntoConstraints="NO" id="3ne-xi-Ow5">
-                        <rect key="frame" x="16" y="16" width="50" height="50"/>
+                        <rect key="frame" x="16" y="67" width="50" height="50"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="50" id="JgS-By-Vbs"/>
                             <constraint firstAttribute="width" constant="50" id="LbO-hG-73G"/>
@@ -31,19 +31,19 @@
                         </userDefinedRuntimeAttributes>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="湿地晒得很飒的撒的哈说打开大姐撒大姐撒娇大姐撒娇的撒的撒觉得撒娇大姐家撒谎的撒" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="18Q-V5-v2h">
-                        <rect key="frame" x="82" y="20.666666666666668" width="311" height="40.666666666666657"/>
+                        <rect key="frame" x="82" y="71.666666666666671" width="311" height="40.666666666666671"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OuA-Hl-lvf">
-                        <rect key="frame" x="457" y="30" width="20" height="22"/>
+                        <rect key="frame" x="457" y="81" width="20" height="22"/>
                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                         <state key="normal" image="create_play"/>
                         <state key="selected" image="create_pause"/>
                     </button>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cfq-OF-H2b">
-                        <rect key="frame" x="419" y="29" width="24" height="24"/>
+                        <rect key="frame" x="419" y="80" width="24" height="24"/>
                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                         <state key="normal" image="create_edit"/>
                         <state key="disabled" image="create_disedit"/>
@@ -71,21 +71,32 @@
                         </constraints>
                     </view>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="create_new" translatesAutoresizingMaskIntoConstraints="NO" id="Fmc-2M-N1Q">
-                        <rect key="frame" x="41" y="16" width="40" height="16"/>
+                        <rect key="frame" x="54" y="59" width="40" height="16"/>
                     </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3ts-wW-gui">
+                        <rect key="frame" x="437" y="80" width="24" height="24"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="24" id="mBZ-oK-KeU"/>
+                            <constraint firstAttribute="height" constant="24" id="pRW-06-3Sz"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" title="Button" image="choose_normal"/>
+                    </button>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="Fmc-2M-N1Q" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="41" id="3WE-qC-DO3"/>
+                    <constraint firstItem="3ts-wW-gui" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="18t-Gs-s5b"/>
+                    <constraint firstItem="Fmc-2M-N1Q" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="54" id="3WE-qC-DO3"/>
                     <constraint firstAttribute="trailing" secondItem="JLI-tJ-C58" secondAttribute="trailing" id="AJg-cx-FJn"/>
                     <constraint firstItem="JLI-tJ-C58" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="B8g-pp-Vp5"/>
+                    <constraint firstAttribute="trailing" secondItem="3ts-wW-gui" secondAttribute="trailing" constant="32" id="BJi-8L-zY9"/>
                     <constraint firstItem="OuA-Hl-lvf" firstAttribute="leading" secondItem="cfq-OF-H2b" secondAttribute="trailing" constant="14" id="FNw-7N-JBD"/>
                     <constraint firstItem="OuA-Hl-lvf" firstAttribute="centerY" secondItem="cfq-OF-H2b" secondAttribute="centerY" id="KTN-LC-tFd"/>
-                    <constraint firstItem="Fmc-2M-N1Q" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="16" id="Paq-id-0b5"/>
+                    <constraint firstItem="3ne-xi-Ow5" firstAttribute="top" secondItem="Fmc-2M-N1Q" secondAttribute="bottom" constant="-8" id="Ux7-ox-ner"/>
                     <constraint firstItem="3ne-xi-Ow5" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="VBT-uT-e43"/>
                     <constraint firstItem="18Q-V5-v2h" firstAttribute="centerY" secondItem="3ne-xi-Ow5" secondAttribute="centerY" id="XVo-2u-cTW"/>
                     <constraint firstItem="cfq-OF-H2b" firstAttribute="centerY" secondItem="18Q-V5-v2h" secondAttribute="centerY" id="YEK-4D-RQu"/>
-                    <constraint firstItem="3ne-xi-Ow5" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="16" id="cHP-X1-jpd"/>
                     <constraint firstItem="18Q-V5-v2h" firstAttribute="leading" secondItem="3ne-xi-Ow5" secondAttribute="trailing" constant="16" id="gGx-qQ-Xor"/>
+                    <constraint firstItem="3ne-xi-Ow5" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="jv9-lp-WHR"/>
                     <constraint firstAttribute="bottom" secondItem="JLI-tJ-C58" secondAttribute="bottom" id="ljQ-tM-FQF"/>
                     <constraint firstAttribute="trailing" secondItem="18Q-V5-v2h" secondAttribute="trailing" constant="100" id="mHk-Xe-pqR"/>
                     <constraint firstAttribute="trailing" secondItem="OuA-Hl-lvf" secondAttribute="trailing" constant="16" id="uD6-Km-uJh"/>
@@ -105,6 +116,7 @@
             </userDefinedRuntimeAttributes>
             <connections>
                 <outlet property="avatarImageView" destination="3ne-xi-Ow5" id="6vd-Kp-CNv"/>
+                <outlet property="chooseButton" destination="3ts-wW-gui" id="qeb-lo-cRQ"/>
                 <outlet property="createNewImageView" destination="Fmc-2M-N1Q" id="9k2-jy-gCa"/>
                 <outlet property="editButton" destination="cfq-OF-H2b" id="NJZ-g8-SDl"/>
                 <outlet property="faildImgView" destination="kVo-yZ-fVC" id="dN2-Xe-RWO"/>
@@ -118,6 +130,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="choose_normal" width="24" height="24"/>
         <image name="create_disedit" width="24" height="24"/>
         <image name="create_edit" width="24" height="24"/>
         <image name="create_new" width="40" height="16"/>

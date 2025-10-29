@@ -37,8 +37,9 @@
         // 修复：正确获取数据路径 - 从 dic[@"data"][@"list"] 获取
         if([dic[@"code"] integerValue] == 0){
             NSDictionary * dataDict = dic[@"data"];
-            NSArray * listArray = @[dataDict];
-            if(listArray && listArray.count > 0){
+            // 修复：检查dataDict是否有效且不为空
+            if(dataDict && ![dataDict isKindOfClass:[NSNull class]] && [dataDict count] > 0){
+                NSArray * listArray = @[dataDict];
                 weakSelf.dataArr = [NSMutableArray arrayWithArray:listArray];
                 weakSelf.emptyView.hidden = YES;
             }else{
@@ -116,8 +117,13 @@
             }
         }
         
-        // 更新UI - 使用deleteSections会更平滑
+        // 更新UI - 检查数组是否为空来显示/隐藏空视图
         dispatch_main_async_safe(^{
+            if(weakSelf.dataArr.count == 0){
+                weakSelf.emptyView.hidden = NO;
+            }else{
+                weakSelf.emptyView.hidden = YES;
+            }
             [weakSelf.listTableView reloadData];
         });
 

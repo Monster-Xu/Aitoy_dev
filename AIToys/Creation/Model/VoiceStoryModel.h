@@ -78,6 +78,7 @@ typedef NS_ENUM(NSInteger, StoryType) {
 // UI状态属性
 @property (nonatomic, assign) BOOL isNew;       // 是否显示New标签
 @property (nonatomic, assign) BOOL isPlaying;   // 是否正在播放
+@property (nonatomic, assign) BOOL isLoading;   // 是否正在加载音频
 
 // 便利方法
 - (NSString *)storyTypeDescription;

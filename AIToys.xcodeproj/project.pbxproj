@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		18083CAC2EB137680021A170 /* my_gif.gif in Resources */ = {isa = PBXBuildFile; fileRef = 18083CAB2EB137680021A170 /* my_gif.gif */; };
 		18550FD92EA4A1D4006C590D /* WiFiListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18550FD72EA4A1D4006C590D /* WiFiListViewController.m */; };
 		18550FDA2EA4A1D4006C590D /* WiFiListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 18550FD82EA4A1D4006C590D /* WiFiListViewController.xib */; };
 		18550FDE2EA4BDC0006C590D /* WiFiListTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 18550FDC2EA4BDC0006C590D /* WiFiListTableViewCell.m */; };
@@ -23,7 +24,6 @@
 		18CFC05E2EA4070400440166 /* DeviceConnectSuccessViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18CFC05B2EA4070400440166 /* DeviceConnectSuccessViewController.m */; };
 		18D23F132EA40D4700E67CC3 /* DeviceConnectFailedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 18D23F122EA40D4700E67CC3 /* DeviceConnectFailedViewController.xib */; };
 		18D23F142EA40D4700E67CC3 /* DeviceConnectFailedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18D23F112EA40D4700E67CC3 /* DeviceConnectFailedViewController.m */; };
-		18D869DC2EAE497500259693 /* 声音处理.gif in Resources */ = {isa = PBXBuildFile; fileRef = 18D869DB2EAE497500259693 /* 声音处理.gif */; };
 		18EE7F4E2E8AD92B00E9E078 /* ThirdPartySDKInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18EE7F4C2E8AD92B00E9E078 /* ThirdPartySDKInfoViewController.m */; };
 		18EE7F4F2E8AD92B00E9E078 /* ThirdPartySDKInfoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 18EE7F4D2E8AD92B00E9E078 /* ThirdPartySDKInfoViewController.xib */; };
 		A3E81D34F080E0F6069DDC1F /* libPods-AIToys.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CD81051212684563E5D7D2BB /* libPods-AIToys.a */; };
@@ -78,7 +78,6 @@
 		DC674C252E41ED0000BF438E /* QATabAnimationTwoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DC674C222E41ED0000BF438E /* QATabAnimationTwoCell.m */; };
 		DC674C292E41EF6500BF438E /* QATabAnimationThreeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = DC674C272E41EF6500BF438E /* QATabAnimationThreeCell.m */; };
 		DC674C2A2E41EF6500BF438E /* QATabAnimationThreeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DC674C282E41EF6500BF438E /* QATabAnimationThreeCell.xib */; };
-		DC6FA12E2E321D8800D6301E /* loading.gif in Resources */ = {isa = PBXBuildFile; fileRef = DC6FA12D2E321D8800D6301E /* loading.gif */; };
 		DC70F1DF2E1BA4A700C4D646 /* FindDollModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DC70F1DE2E1BA4A700C4D646 /* FindDollModel.m */; };
 		DC70F1E32E1BC54700C4D646 /* HomeDollModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DC70F1E22E1BC54700C4D646 /* HomeDollModel.m */; };
 		DC70F1E72E1E544F00C4D646 /* UserPermmitVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = DC70F1E62E1E544F00C4D646 /* UserPermmitVC.xib */; };
@@ -274,7 +273,6 @@
 		E46A38CF2E09A01000C930D3 /* CoreArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = E46A38CA2E09A01000C930D3 /* CoreArchive.m */; };
 		E46A38D02E09A01000C930D3 /* NSString+File.m in Sources */ = {isa = PBXBuildFile; fileRef = E46A38CD2E09A01000C930D3 /* NSString+File.m */; };
 		E46A38D32E0B063100C930D3 /* ToysGuideFindVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E46A38D22E0B063100C930D3 /* ToysGuideFindVC.m */; };
-		E46A38D52E0C354B00C930D3 /* my_gif.gif in Resources */ = {isa = PBXBuildFile; fileRef = E46A38D42E0C354B00C930D3 /* my_gif.gif */; };
 		E46A38D92E0C4B4D00C930D3 /* HomeToysListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = E46A38D72E0C4B4D00C930D3 /* HomeToysListVC.m */; };
 		E46A38DA2E0C4B4D00C930D3 /* HomeToysListVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = E46A38D82E0C4B4D00C930D3 /* HomeToysListVC.xib */; };
 		E46F39622E0FD51E0039CE33 /* FindDeviceAlertCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E46F39602E0FD51E0039CE33 /* FindDeviceAlertCell.m */; };
@@ -402,6 +400,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		18083CAB2EB137680021A170 /* my_gif.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = my_gif.gif; sourceTree = "<group>"; };
 		18550FD62EA4A1D4006C590D /* WiFiListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WiFiListViewController.h; sourceTree = "<group>"; };
 		18550FD72EA4A1D4006C590D /* WiFiListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WiFiListViewController.m; sourceTree = "<group>"; };
 		18550FD82EA4A1D4006C590D /* WiFiListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WiFiListViewController.xib; sourceTree = "<group>"; };
@@ -425,7 +424,6 @@
 		18D23F102EA40D4700E67CC3 /* DeviceConnectFailedViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceConnectFailedViewController.h; sourceTree = "<group>"; };
 		18D23F112EA40D4700E67CC3 /* DeviceConnectFailedViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceConnectFailedViewController.m; sourceTree = "<group>"; };
 		18D23F122EA40D4700E67CC3 /* DeviceConnectFailedViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DeviceConnectFailedViewController.xib; sourceTree = "<group>"; };
-		18D869DB2EAE497500259693 /* 声音处理.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "声音处理.gif"; sourceTree = "<group>"; };
 		18EE7F4A2E882F7C00E9E078 /* ModernScreenAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ModernScreenAdapter.h; sourceTree = "<group>"; };
 		18EE7F4B2E8AD92B00E9E078 /* ThirdPartySDKInfoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThirdPartySDKInfoViewController.h; sourceTree = "<group>"; };
 		18EE7F4C2E8AD92B00E9E078 /* ThirdPartySDKInfoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThirdPartySDKInfoViewController.m; sourceTree = "<group>"; };
@@ -520,7 +518,6 @@
 		DC674C262E41EF6500BF438E /* QATabAnimationThreeCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QATabAnimationThreeCell.h; sourceTree = "<group>"; };
 		DC674C272E41EF6500BF438E /* QATabAnimationThreeCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QATabAnimationThreeCell.m; sourceTree = "<group>"; };
 		DC674C282E41EF6500BF438E /* QATabAnimationThreeCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = QATabAnimationThreeCell.xib; sourceTree = "<group>"; };
-		DC6FA12D2E321D8800D6301E /* loading.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = loading.gif; sourceTree = "<group>"; };
 		DC70F1DD2E1BA4A700C4D646 /* FindDollModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FindDollModel.h; sourceTree = "<group>"; };
 		DC70F1DE2E1BA4A700C4D646 /* FindDollModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FindDollModel.m; sourceTree = "<group>"; };
 		DC70F1E12E1BC54700C4D646 /* HomeDollModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HomeDollModel.h; sourceTree = "<group>"; };
@@ -890,7 +887,6 @@
 		E46A38CE2E09A01000C930D3 /* CoreArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreArchive.h; sourceTree = "<group>"; };
 		E46A38D12E0B063100C930D3 /* ToysGuideFindVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToysGuideFindVC.h; sourceTree = "<group>"; };
 		E46A38D22E0B063100C930D3 /* ToysGuideFindVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToysGuideFindVC.m; sourceTree = "<group>"; };
-		E46A38D42E0C354B00C930D3 /* my_gif.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = my_gif.gif; sourceTree = "<group>"; };
 		E46A38D62E0C4B4D00C930D3 /* HomeToysListVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HomeToysListVC.h; sourceTree = "<group>"; };
 		E46A38D72E0C4B4D00C930D3 /* HomeToysListVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HomeToysListVC.m; sourceTree = "<group>"; };
 		E46A38D82E0C4B4D00C930D3 /* HomeToysListVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HomeToysListVC.xib; sourceTree = "<group>"; };
@@ -2235,11 +2231,9 @@
 				E49272152E01BD2F00DB6A2A /* ViewController.m */,
 				E49272172E01BD2F00DB6A2A /* Main.storyboard */,
 				E492721A2E01BD3100DB6A2A /* Assets.xcassets */,
-				18D869DB2EAE497500259693 /* 声音处理.gif */,
 				E492721F2E01BD3100DB6A2A /* Info.plist */,
+				18083CAB2EB137680021A170 /* my_gif.gif */,
 				DC3E06942E2A3AF80099A9FB /* PrivacyInfo.xcprivacy */,
-				E46A38D42E0C354B00C930D3 /* my_gif.gif */,
-				DC6FA12D2E321D8800D6301E /* loading.gif */,
 				E49272202E01BD3100DB6A2A /* main.m */,
 				E49272AE2E01C70A00DB6A2A /* Localizable.strings */,
 				E49272B92E01C80700DB6A2A /* InfoPlist.strings */,
@@ -2529,7 +2523,6 @@
 				DC70F1EC2E1E56C200C4D646 /* UserPermmitCell.xib in Resources */,
 				E49272E82E03102300DB6A2A /* SetPasswordVC.xib in Resources */,
 				E4A62AF22E251B4D00C9E0B6 /* FamailyOperationCell.xib in Resources */,
-				DC6FA12E2E321D8800D6301E /* loading.gif in Resources */,
 				DCA5A1A82E290E8500096913 /* PrivateSettingCell.xib in Resources */,
 				18550FDF2EA4BDC0006C590D /* WiFiListTableViewCell.xib in Resources */,
 				DC862AEE2E095C2E001A4793 /* JoinFamailyVC.xib in Resources */,
@@ -2560,8 +2553,6 @@
 				DC862AE32E095470001A4793 /* FamailyMemeberAvatarCell.xib in Resources */,
 				E46F39722E0FDE900039CE33 /* DeviceUnfindCell.xib in Resources */,
 				DCA5A1A32E29085A00096913 /* RevokePrivacyPolicyVC.xib in Resources */,
-				18D869DC2EAE497500259693 /* 声音处理.gif in Resources */,
-				E46A38D52E0C354B00C930D3 /* my_gif.gif in Resources */,
 				E49272AC2E01C70A00DB6A2A /* Localizable.strings in Resources */,
 				E42A8A202E0678A400AD0BD9 /* HomeNoDeviceCell.xib in Resources */,
 				DC4877002E60909000967B2D /* configList.json in Resources */,
@@ -2624,6 +2615,7 @@
 				DC674C2A2E41EF6500BF438E /* QATabAnimationThreeCell.xib in Resources */,
 				DCEA00FA2E126BD400170D8C /* SelectWifCell.xib in Resources */,
 				DC1583E32E0533920097CF0A /* SetNewPasswordViewController.xib in Resources */,
+				18083CAC2EB137680021A170 /* my_gif.gif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

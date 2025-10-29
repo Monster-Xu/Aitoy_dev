@@ -17,6 +17,7 @@
 #import "SkeletonTableViewCell.h"
 #import "CreateStoryWithVoiceViewController.h"
 #import "AudioPlayerView.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 static NSString *const kNormalCellIdentifier = @"NormalCell";
 static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
@@ -41,6 +42,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
 // 音频播放器
 @property (nonatomic, strong) AudioPlayerView *currentAudioPlayer;
 @property (nonatomic, assign) NSInteger currentPlayingIndex; // 记录当前播放的故事索引
+@property (nonatomic, assign) NSInteger currentLoadingIndex; // 记录当前正在加载音频的故事索引
 
 @end
 
@@ -61,6 +63,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     
     // 初始化播放状态
     self.currentPlayingIndex = -1; // -1 表示没有正在播放的音频
+    self.currentLoadingIndex = -1; // -1 表示没有正在加载的音频
     
     // ✅ 初始化骨架屏相关属性
     self.isLoading = NO;
@@ -75,7 +78,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
 - (void)dealloc {
     // 清理音频播放器
     if (self.currentAudioPlayer) {
-        [self.currentAudioPlayer hide];
+        [self.currentAudioPlayer stop];
         self.currentAudioPlayer = nil;
     }
     
@@ -116,7 +119,16 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     
     // 清理音频播放器
     if (self.currentAudioPlayer) {
-        [self.currentAudioPlayer hide];
+        [self.currentAudioPlayer stop];
+    }
+    
+    // 隐藏加载指示器
+    [SVProgressHUD dismiss];
+    
+    // 清除加载状态
+    if (self.currentLoadingIndex >= 0) {
+        [self updateLoadingStateForStory:self.currentLoadingIndex isLoading:NO];
+        self.currentLoadingIndex = -1;
     }
     
     // ✅ 停止所有骨架屏动画
@@ -187,9 +199,9 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     self.tableView.backgroundColor = [UIColor clearColor];
     self.tableView.hidden = YES;
     
-    // 配置多选编辑
-    self.tableView.allowsMultipleSelectionDuringEditing = YES;
-    self.tableView.allowsSelectionDuringEditing = YES;
+//    // 配置多选编辑
+//    self.tableView.allowsMultipleSelectionDuringEditing = YES;
+//    self.tableView.allowsSelectionDuringEditing = YES;
     
     [self.tableView registerClass:[VoiceStoryTableViewCell class] forCellReuseIdentifier:@"VoiceStoryTableViewCell"];
     // ✅ 注册骨架屏 Cell
@@ -211,7 +223,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
 
 - (void)setupTableViewConstraints {
     [self.tableView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.customNavBarView.mas_bottom).offset(10);
+        make.top.equalTo(self.customNavBarView.mas_bottom).offset(5);
         make.left.right.equalTo(self.view);
         make.bottom.equalTo(self.view.mas_safeAreaLayoutGuideBottom);
     }];
@@ -501,7 +513,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     NSLog(@"[CreationVC] 开始下拉刷新...");
     
     // ✅ 显示骨架屏
-    self.isLoading = YES;
+    self.isLoading = NO;
     [self.tableView reloadData];
     
     // 创建分页请求参数
@@ -516,7 +528,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
         NSLog(@"[CreationVC] 刷新数据成功，共 %ld 条", (long)response.total);
         
         // ✅ 隐藏骨架屏
-        strongSelf.isLoading = NO;
+//        strongSelf.isLoading = NO;
         
         // 更新数据源
         [strongSelf.dataSource removeAllObjects];
@@ -665,7 +677,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
         
         // 如果是生成中、音频生成中或失败状态，需要额外的空间显示状态提示
         if (model.storyStatus == 1 || model.storyStatus == 3 || model.storyStatus == 4) {
-            return 108; // 卡片内容高度，无上下边距
+            return 122; // 卡片内容高度，无上下边距
         }
         
         // 正常状态
@@ -675,11 +687,11 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
 
 // ✅ 添加：section 之间的间距（通过 footer 实现）
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return section == 0 ? 10 : 5; // 第一个 section 顶部间距大一些
+    return section == 0 ? 5 : 5; // 第一个 section 顶部间距大一些
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    return 5;
+    return 10;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
@@ -828,7 +840,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
             [self enterBatchEditingMode];
             
             // 自动选中长按的项目
-            [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionNone];
+//            [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionNone];
             [self updateDeleteButtonState];
             
             NSLog(@"✅ 批量编辑模式已激活，已选中第 %ld 个项目", (long)indexPath.section);
@@ -860,17 +872,24 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     
     // 停止当前音频播放
     if (self.currentAudioPlayer) {
-        [self.currentAudioPlayer hide];
+        [self.currentAudioPlayer stop];
         [self updatePlayingStateForStory:self.currentPlayingIndex isPlaying:NO];
         self.currentPlayingIndex = -1;
         self.currentAudioPlayer = nil;
+    }
+    
+    // 清除加载状态
+    if (self.currentLoadingIndex >= 0) {
+        [SVProgressHUD dismiss];
+        [self updateLoadingStateForStory:self.currentLoadingIndex isLoading:NO];
+        self.currentLoadingIndex = -1;
     }
     
     // 1. 设置标记
     self.isBatchEditingMode = YES;
     
     // 2. TableView 进入编辑模式
-    [self.tableView setEditing:YES animated:YES];
+//    [self.tableView setEditing:YES animated:YES];
     
     // 3. 隐藏 TabBar
     if (self.tabBarController) {
@@ -943,7 +962,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     self.isBatchEditingMode = NO;
     
     // 2. TableView 退出编辑模式
-    [self.tableView setEditing:NO animated:YES];
+//    [self.tableView setEditing:NO animated:YES];
     
     // 3. 更新导航栏
     [self updateCustomNavBarForEditingMode:NO];
@@ -998,9 +1017,10 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
             cell.isBatchEditingMode = self.isBatchEditingMode;
             
             // 触发 setEditing 方法更新按钮状态
-            [cell setEditing:cell.isEditing animated:YES];
+            [cell setEditing:self.isBatchEditingMode animated:YES];
         }
     }
+    
 }
 
 - (void)updateCustomNavBarForEditingMode:(BOOL)isEditing {
@@ -1053,13 +1073,13 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
         [self.customNavBarView addSubview:titleLabel];
         
         UIButton *soundButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [soundButton setImage:[UIImage systemImageNamed:@"speaker.wave.2.fill"] forState:UIControlStateNormal];
+        [soundButton setImage:[UIImage imageNamed:@"create_voice"] forState:UIControlStateNormal];
         soundButton.tintColor = [UIColor systemGrayColor];
         [soundButton addTarget:self action:@selector(soundButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.customNavBarView addSubview:soundButton];
         
         UIButton *addButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [addButton setImage:[UIImage systemImageNamed:@"plus.circle.fill"] forState:UIControlStateNormal];
+        [addButton setImage:[UIImage imageNamed:@"create_add"] forState:UIControlStateNormal];
         addButton.tintColor = [UIColor systemGrayColor];
         [addButton addTarget:self action:@selector(addButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.customNavBarView addSubview:addButton];
@@ -1163,7 +1183,7 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     if (self.currentPlayingIndex >= 0) {
         for (NSIndexPath *indexPath in indexPaths) {
             if (indexPath.section == self.currentPlayingIndex) {
-                [self.currentAudioPlayer hide];
+                [self.currentAudioPlayer stop];
                 self.currentPlayingIndex = -1;
                 self.currentAudioPlayer = nil;
                 break;
@@ -1369,8 +1389,14 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
         
         // 如果已有播放器在播放其他音频，先停止
         if (self.currentAudioPlayer && self.currentPlayingIndex != index) {
-            [self.currentAudioPlayer hide];
+            [self.currentAudioPlayer stop];
             [self updatePlayingStateForStory:self.currentPlayingIndex isPlaying:NO];
+            
+            // 如果之前有加载状态，清除它
+            if (self.currentLoadingIndex >= 0 && self.currentLoadingIndex != index) {
+                [SVProgressHUD dismiss];
+                [self updateLoadingStateForStory:self.currentLoadingIndex isLoading:NO];
+            }
         }
         
         // 如果点击的是当前正在播放的故事
@@ -1405,23 +1431,43 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     // 检查音频URL
     if (!model.audioUrl || model.audioUrl.length == 0) {
         NSLog(@"⚠️ 音频URL为空，无法播放");
-        
         return;
     }
     
-    // 创建新的音频播放器
-    self.currentAudioPlayer = [[AudioPlayerView alloc] initWithAudioURL:model.audioUrl storyTitle:model.storyName coverImageURL:model.illustrationUrl];
+    // 设置当前正在加载的索引
+    self.currentLoadingIndex = index;
+    
+    // 显示加载中
+    [SVProgressHUD showWithStatus:@"加载音频中..."];
+    [SVProgressHUD setDefaultStyle:SVProgressHUDStyleDark];
+    
+    // 更新 cell 状态为加载中
+    [self updateLoadingStateForStory:index isLoading:YES];
+    
+    // 设置超时处理，防止长时间加载
+    __weak typeof(self) weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        if (strongSelf && strongSelf.currentLoadingIndex == index) {
+            NSLog(@"⚠️ 音频加载超时");
+            [SVProgressHUD showErrorWithStatus:@"加载超时，请重试"];
+            [strongSelf updateLoadingStateForStory:index isLoading:NO];
+            strongSelf.currentLoadingIndex = -1;
+        }
+    });
+    
+    // 创建新的音频播放器（后台播放模式，不显示UI）
+    self.currentAudioPlayer = [[AudioPlayerView alloc] initWithAudioURL:model.audioUrl backgroundPlay:YES];
     self.currentAudioPlayer.delegate = self;
     
-    // 显示播放器并开始播放
-    [self.currentAudioPlayer showInView:self.view];
-    [self.currentAudioPlayer play];
+    // 直接在后台播放，不显示UI
+    [self.currentAudioPlayer playInBackground];
     
     // 更新状态
     self.currentPlayingIndex = index;
     model.isPlaying = YES;
     
-    NSLog(@"✅ 开始播放音频: %@", model.audioUrl);
+    NSLog(@"✅ 开始播放音频（后台模式）: %@", model.audioUrl);
 }
 
 /// 更新指定故事的播放状态
@@ -1436,10 +1482,32 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     }
 }
 
+/// 更新指定故事的加载状态
+- (void)updateLoadingStateForStory:(NSInteger)index isLoading:(BOOL)isLoading {
+    if (index >= 0 && index < self.dataSource.count) {
+        VoiceStoryModel *model = self.dataSource[index];
+        model.isLoading = isLoading;
+        
+        // 刷新对应的 cell
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:index];
+        [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+    }
+}
+
 #pragma mark - AudioPlayerViewDelegate
 
 - (void)audioPlayerDidStartPlaying {
     NSLog(@"🎵 音频开始播放");
+    
+    // 隐藏加载指示器
+    [SVProgressHUD dismiss];
+    
+    // 清除加载状态
+    if (self.currentLoadingIndex >= 0) {
+        [self updateLoadingStateForStory:self.currentLoadingIndex isLoading:NO];
+        self.currentLoadingIndex = -1;
+    }
+    
     [self updatePlayingStateForStory:self.currentPlayingIndex isPlaying:YES];
 }
 
@@ -1452,10 +1520,21 @@ static NSString *const kSkeletonCellIdentifier = @"SkeletonCell";
     NSLog(@"🏁 音频播放完成");
     [self updatePlayingStateForStory:self.currentPlayingIndex isPlaying:NO];
     self.currentPlayingIndex = -1;
+    self.currentAudioPlayer = nil;
 }
 
 - (void)audioPlayerDidClose {
     NSLog(@"❌ 音频播放器关闭");
+    
+    // 隐藏加载指示器（如果正在显示）
+    [SVProgressHUD dismiss];
+    
+    // 清除加载状态
+    if (self.currentLoadingIndex >= 0) {
+        [self updateLoadingStateForStory:self.currentLoadingIndex isLoading:NO];
+        self.currentLoadingIndex = -1;
+    }
+    
     [self updatePlayingStateForStory:self.currentPlayingIndex isPlaying:NO];
     self.currentPlayingIndex = -1;
     self.currentAudioPlayer = nil;

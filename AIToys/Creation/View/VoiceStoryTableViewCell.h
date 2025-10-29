@@ -33,8 +33,22 @@ NS_ASSUME_NONNULL_BEGIN
 // ⭐️ 关键属性：明确标记是否为批量编辑模式
 @property (nonatomic, assign) BOOL isBatchEditingMode;
 
+// ✅ 自定义选择框相关属性
+@property (nonatomic, strong) UIButton *chooseButton; // 选择按钮（改为Button）
+@property (nonatomic, assign) BOOL isCustomSelected; // 自定义选中状态
+
+// ✅ 音频加载状态相关属性
+@property (nonatomic, strong) UIActivityIndicatorView *loadingIndicator; // 加载指示器
+@property (nonatomic, assign) BOOL isAudioLoading; // 音频加载状态
+
 // 标识当前故事的跳转目标
 @property (nonatomic, assign) BOOL shouldJumpToVoiceVC; // YES: 跳转到 CreateStoryWithVoiceVC, NO: 跳转到 CreateStoryVC
+
+/// ✅ 更新自定义选择状态
+- (void)updateSelectionState:(BOOL)selected;
+
+/// ✅ 显示/隐藏音频加载状态
+- (void)showAudioLoading:(BOOL)loading;
 
 @end
 

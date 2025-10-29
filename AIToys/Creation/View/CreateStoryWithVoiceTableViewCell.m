@@ -16,9 +16,6 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     
-    // 设置圆角
-    self.headerImageView.layer.cornerRadius = self.headerImageView.frame.size.width / 2;
-    self.headerImageView.layer.masksToBounds = YES;
     
 }
 

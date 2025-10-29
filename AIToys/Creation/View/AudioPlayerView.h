@@ -31,6 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 // 新增的初始化方法
 - (instancetype)initWithAudioURL:(NSString *)audioURL storyTitle:(NSString *)title coverImageURL:(NSString *)coverImageURL;
 
+// 新增的后台播放初始化方法（不显示UI）
+- (instancetype)initWithAudioURL:(NSString *)audioURL backgroundPlay:(BOOL)backgroundPlay;
+
 // 显示和隐藏方法
 - (void)showInView:(UIView *)parentView;
 - (void)showInView:(UIView *)parentView withFrame:(CGRect)frame;
@@ -42,6 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)pause;
 - (void)stop;
 -(void)rePlay;
+
+// 后台播放方法（直接播放，不显示UI）
+- (void)playInBackground;
 
 // 是否正在播放
 - (BOOL)isPlaying;

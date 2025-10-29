@@ -30,11 +30,11 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Talenpal Player" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VAn-cJ-Mkb">
-                        <rect key="frame" x="0.0" y="249" width="421" height="13"/>
+                        <rect key="frame" x="0.0" y="254" width="421" height="13"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="13" id="2rf-q7-1BX"/>
                         </constraints>
-                        <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="11"/>
+                        <fontDescription key="fontDescription" name="SFProRounded-Regular" family="SF Pro Rounded" pointSize="14"/>
                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
                     </label>
@@ -53,7 +53,9 @@
                         </constraints>
                         <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <state key="normal" title="Button"/>
-                        <buttonConfiguration key="configuration" style="plain" title="添加此设备"/>
+                        <buttonConfiguration key="configuration" style="plain" title="添加此设备">
+                            <fontDescription key="titleFontDescription" name="PingFangSC-Regular" family="PingFang SC" pointSize="14"/>
+                        </buttonConfiguration>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                 <real key="value" value="18"/>
@@ -76,7 +78,7 @@
                 <constraint firstItem="VAn-cJ-Mkb" firstAttribute="centerX" secondItem="3sf-JJ-4wa" secondAttribute="centerX" id="WN7-2N-05R"/>
                 <constraint firstItem="Iaf-A3-zwF" firstAttribute="centerX" secondItem="3sf-JJ-4wa" secondAttribute="centerX" id="ZNo-M4-2gX"/>
                 <constraint firstItem="VAn-cJ-Mkb" firstAttribute="leading" secondItem="3sf-JJ-4wa" secondAttribute="leading" id="i2a-Z7-5dR"/>
-                <constraint firstItem="VAn-cJ-Mkb" firstAttribute="top" secondItem="Iaf-A3-zwF" secondAttribute="bottom" constant="10" id="kzB-5S-hev"/>
+                <constraint firstItem="VAn-cJ-Mkb" firstAttribute="top" secondItem="Iaf-A3-zwF" secondAttribute="bottom" constant="15" id="kzB-5S-hev"/>
             </constraints>
             <size key="customSize" width="421" height="412"/>
             <userDefinedRuntimeAttributes>
