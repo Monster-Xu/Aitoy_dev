@@ -986,7 +986,7 @@
 
 /// 更新创建按钮状态
 - (void)updateCreateButtonState {
-    NSInteger maxVoiceCount = 4;
+    NSInteger maxVoiceCount = 3;
     NSInteger currentCount = self.voiceList.count;
     
     if (currentCount >= maxVoiceCount) {
@@ -1006,7 +1006,7 @@
 
 -(void)createVoiceBtnClick{
     // ✅ 检查声音数量是否已达到最大限制
-    NSInteger maxVoiceCount = 4;
+    NSInteger maxVoiceCount = 3;
     if (self.voiceList.count >= maxVoiceCount) {
         [self showErrorAlert:@"创建失败" message:[NSString stringWithFormat:@"最多只能创建%ld个音色，请删除一些音色后再试", (long)maxVoiceCount]];
         return;

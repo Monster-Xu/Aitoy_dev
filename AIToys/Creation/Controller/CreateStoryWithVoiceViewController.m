@@ -1178,8 +1178,8 @@
 }
 
 - (IBAction)addNewVoice:(id)sender {
-    if (self.voiceCount>=4) {
-        [SVProgressHUD showErrorWithStatus:@"已创建4个音色，请删除后再创建"];
+    if (self.voiceCount>=3) {
+        [SVProgressHUD showErrorWithStatus:@"已创建3个音色，请删除后再创建"];
     }else{
         CreateVoiceViewController * vc = [[CreateVoiceViewController alloc]init];
         [self.navigationController pushViewController:vc animated:YES];
